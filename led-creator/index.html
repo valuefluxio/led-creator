@@ -639,9 +639,65 @@
         color: var(--text);
         border-color: #555;
       }
+      /* Mobile notice */
+      #mobile-notice {
+        display: none;
+      }
+      @media (max-width: 767px) {
+        #mobile-notice {
+          display: flex;
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: #0a0a0a;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+          text-align: center;
+          gap: 1.2rem;
+        }
+        #mobile-notice .mn-icon {
+          font-size: 3rem;
+          line-height: 1;
+        }
+        #mobile-notice h2 {
+          font-size: 1.25rem;
+          color: #fff;
+          font-weight: 600;
+          margin: 0;
+        }
+        #mobile-notice p {
+          font-size: 0.875rem;
+          color: #888;
+          line-height: 1.6;
+          max-width: 280px;
+          margin: 0;
+        }
+        #mobile-notice .mn-badge {
+          font-size: 0.7rem;
+          font-family: monospace;
+          color: #00d4ff;
+          border: 1px solid rgba(0, 212, 255, 0.3);
+          padding: 4px 12px;
+          border-radius: 20px;
+          letter-spacing: 0.08em;
+        }
+      }
     </style>
   </head>
   <body>
+    <!-- MOBILE NOTICE -->
+    <div id="mobile-notice">
+      <div class="mn-icon">🖥️</div>
+      <h2>Desktop Only</h2>
+      <p>
+        LED Screen Content Creator is designed for desktop browsers. Please open
+        it on a computer for the full experience.
+      </p>
+      <span class="mn-badge">led-creator.vercel.app</span>
+    </div>
+
     <!-- SETUP MODAL -->
     <div id="modal-overlay">
       <div id="modal">
