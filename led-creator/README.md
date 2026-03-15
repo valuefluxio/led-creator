@@ -4,6 +4,8 @@ A single-file browser tool for creating, previewing, and exporting animated cont
 
 **Live:** https://led-creator.vercel.app
 
+**Presentation:** https://presentations-delta-seven.vercel.app/led-creator-slides.html
+
 ---
 
 ## Overview
