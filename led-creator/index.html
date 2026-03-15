@@ -683,6 +683,24 @@
           border-radius: 20px;
           letter-spacing: 0.08em;
         }
+        #mobile-proceed {
+          margin-top: 0.5rem;
+          background: none;
+          border: 1px solid #333;
+          color: #666;
+          font-size: 0.78rem;
+          padding: 8px 20px;
+          border-radius: 20px;
+          cursor: pointer;
+          letter-spacing: 0.04em;
+          transition:
+            color 0.2s,
+            border-color 0.2s;
+        }
+        #mobile-proceed:hover {
+          color: #aaa;
+          border-color: #555;
+        }
       }
     </style>
   </head>
@@ -696,6 +714,7 @@
         it on a computer for the full experience.
       </p>
       <span class="mn-badge">led-creator.vercel.app</span>
+      <button id="mobile-proceed">Proceed on mobile browser</button>
     </div>
 
     <!-- SETUP MODAL -->
@@ -2160,6 +2179,12 @@
       };
 
       app.init();
+
+      document
+        .getElementById("mobile-proceed")
+        .addEventListener("click", () => {
+          document.getElementById("mobile-notice").style.display = "none";
+        });
     </script>
   </body>
 </html>
