@@ -121,6 +121,25 @@ Created a 9-slide trilingual presentation (EN / KO / JA) at `presentations/led-c
 
 ---
 
+### 2026-03-15 — Presentation Polish
+
+- Language toggle buttons (EN / KO / JA) resized — font `0.68rem → 0.85rem`, padding increased for easier tapping
+- Presentation title updated to match app: **LED Screen Content Creator**
+- Eyebrow text on title slide set to **ValueFlux Presents**
+- Copyright text color made visible across both app and presentation
+
+---
+
+### 2026-03-15 — Mobile Browser Notice
+
+Added a full-screen overlay shown on screens under 768px wide:
+
+- Informs mobile users the tool is designed for desktop
+- Shows the live URL for easy copy on desktop
+- **"Proceed on mobile browser"** button dismisses the notice and allows full access anyway
+
+---
+
 ## Tech Stack
 
 | Concern   | Approach                                     |

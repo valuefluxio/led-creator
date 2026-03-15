@@ -6,6 +6,8 @@ A single-file browser tool for creating, previewing, and exporting animated cont
 
 **Presentation:** https://presentations-delta-seven.vercel.app/led-creator-slides.html
 
+**GitHub:** https://github.com/valuefluxio/led-creator
+
 ---
 
 ## Overview
@@ -86,11 +88,19 @@ pixelsTall  = round((heightMeters × 1000) / pitchMm)
 
 ---
 
+## Mobile
+
+This tool is designed for desktop browsers. On mobile, a notice is shown with an option to **Proceed on mobile browser** if you still want to explore the UI.
+
+---
+
 ## Project
 
 ```
 led-creator/
-└── index.html    # entire app — no dependencies, no build step
+├── index.html    # entire app — no dependencies, no build step
+├── README.md
+└── DEVLOG.md     # full development history
 ```
 
 **Deploy:**
@@ -98,3 +108,9 @@ led-creator/
 ```bash
 vercel --prod
 ```
+
+---
+
+## Credits
+
+Built by [ValueFlux](https://github.com/valuefluxio) · © 2026 All Rights Reserved
