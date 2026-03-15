@@ -140,6 +140,32 @@ Added a full-screen overlay shown on screens under 768px wide:
 
 ---
 
+### 2026-03-16 — Feature: Scroll Text Speed Control
+
+Added a **Speed** slider to the Scroll Text config panel.
+
+- Range: 0.1 → 3, step 0.1 (fractional for fine-grained control at slow speeds)
+- Default: 0.5 — slow, smooth crawl suitable for LED displays
+- Uses `parseFloat` so fractional values apply correctly per frame
+
+---
+
+### 2026-03-16 — Mobile Browser Notice
+
+Added a full-screen overlay on screens under 768px wide:
+
+- Informs mobile users the tool is designed for desktop
+- Shows the live URL for easy copy on desktop
+- **"Proceed on mobile browser"** button dismisses the notice and allows full access anyway
+
+---
+
+### 2026-03-16 — How to Use Link
+
+Added a **`? How to Use`** link in the top info bar (next to `✎ Edit`) that opens the trilingual presentation in a new tab.
+
+---
+
 ## Tech Stack
 
 | Concern   | Approach                                     |
