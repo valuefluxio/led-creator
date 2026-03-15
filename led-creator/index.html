@@ -201,6 +201,29 @@
         color: var(--accent);
         border-color: var(--accent);
       }
+      #btn-howto {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        font-family: inherit;
+        font-size: 0.72rem;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 6px;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+      }
+      #btn-howto:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
 
       /* CANVAS */
       #canvas-area {
@@ -798,6 +821,13 @@
         ><span class="value" id="bar-res">—</span>
       </div>
       <button id="btn-edit">✎ Edit</button>
+      <a
+        id="btn-howto"
+        href="https://presentations-delta-seven.vercel.app/led-creator-slides.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        >? How to Use</a
+      >
     </div>
 
     <!-- CANVAS AREA -->
