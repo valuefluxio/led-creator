@@ -294,6 +294,42 @@
         color: var(--orange);
       }
 
+      /* CTA launch button */
+      .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, var(--orange) 0%, #ff3f00 100%);
+        color: #fff;
+        font-family: var(--mono);
+        font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: clamp(0.6rem, 1.2vh, 0.9rem) clamp(1.2rem, 2.5vw, 2rem);
+        border-radius: 6px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        box-shadow:
+          0 0 0 1px rgba(255, 107, 53, 0.4),
+          0 8px 32px rgba(255, 107, 53, 0.35);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          gap 0.2s ease;
+        white-space: nowrap;
+      }
+      .cta-btn:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 0 0 1px rgba(255, 107, 53, 0.6),
+          0 12px 40px rgba(255, 107, 53, 0.55);
+        gap: 16px;
+      }
+      .cta-btn:active {
+        transform: translateY(0);
+      }
+
       /* Live URL badge */
       .url-badge {
         display: inline-flex;
@@ -1377,12 +1413,15 @@
           <span class="url-badge"
             ><span class="live-dot"></span>led-creator.vercel.app</span
           >
-          <span
-            class="chip o"
+          <a
+            href="https://led-creator.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="cta-btn"
             data-en="Open in browser →"
             data-ko="브라우저에서 열기 →"
             data-ja="ブラウザで開く →"
-            >Open in browser →</span
+            >Open in browser →</a
           >
         </div>
       </div>
