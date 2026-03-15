@@ -1,1111 +1,2094 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LED Screen Content Creator</title>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0a0a0a; --surface: #141414; --border: #2a2a2a;
-  --accent: #00d4ff; --accent2: #ff6b35; --text: #e8e8e8;
-  --text-dim: #777; --danger: #ff4444; --radius: 8px;
-}
-body { background:var(--bg); color:var(--text); font-family:'SF Mono','Fira Code',Consolas,monospace; height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LED Screen Content Creator</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #0a0a0a;
+        --surface: #141414;
+        --border: #2a2a2a;
+        --accent: #00d4ff;
+        --accent2: #ff6b35;
+        --text: #e8e8e8;
+        --text-dim: #777;
+        --danger: #ff4444;
+        --radius: 8px;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "SF Mono", "Fira Code", Consolas, monospace;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
 
-/* MODAL */
-#modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
-#modal-overlay.hidden { display:none; }
-#modal { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:36px 40px; width:420px; box-shadow:0 24px 80px rgba(0,0,0,.6); }
-#modal h2 { font-size:1.1rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
-#modal .subtitle { color:var(--text-dim); font-size:.78rem; margin-bottom:28px; }
-.field-group { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
-.field { display:flex; flex-direction:column; gap:6px; }
-.field label { font-size:.72rem; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; }
-.field input,.field select { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:inherit; font-size:.9rem; padding:10px 12px; outline:none; transition:border-color .15s; }
-.field input:focus,.field select:focus { border-color:var(--accent); }
-.field select option { background:#1a1a1a; }
-#modal-preview { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin:20px 0; font-size:.82rem; }
-#modal-resolution { color:var(--accent); font-size:1rem; font-weight:600; margin-bottom:4px; }
-#modal-warning { color:var(--danger); font-size:.75rem; min-height:1em; }
-#modal-pixels { color:var(--text-dim); font-size:.73rem; margin-top:4px; }
-#btn-create { width:100%; padding:13px; background:var(--accent); color:#000; border:none; border-radius:var(--radius); font-family:inherit; font-size:.85rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:opacity .15s,transform .1s; }
-#btn-create:hover { opacity:.9; transform:translateY(-1px); }
+      /* MODAL */
+      #modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        backdrop-filter: blur(4px);
+      }
+      #modal-overlay.hidden {
+        display: none;
+      }
+      #modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 36px 40px;
+        width: 420px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+      }
+      #modal h2 {
+        font-size: 1.1rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      #modal .subtitle {
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        margin-bottom: 28px;
+      }
+      .field-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .field label {
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .field input,
+      .field select {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.9rem;
+        padding: 10px 12px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--accent);
+      }
+      .field select option {
+        background: #1a1a1a;
+      }
+      #modal-preview {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin: 20px 0;
+        font-size: 0.82rem;
+      }
+      #modal-resolution {
+        color: var(--accent);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      #modal-warning {
+        color: var(--danger);
+        font-size: 0.75rem;
+        min-height: 1em;
+      }
+      #modal-pixels {
+        color: var(--text-dim);
+        font-size: 0.73rem;
+        margin-top: 4px;
+      }
+      #btn-create {
+        width: 100%;
+        padding: 13px;
+        background: var(--accent);
+        color: #000;
+        border: none;
+        border-radius: var(--radius);
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+          opacity 0.15s,
+          transform 0.1s;
+      }
+      #btn-create:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
 
-/* INFO BAR */
-#info-bar { display:flex; align-items:center; padding:0 16px; height:42px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; font-size:.76rem; color:var(--text-dim); overflow:hidden; }
-.info-chip { display:flex; align-items:center; gap:6px; padding:0 14px; height:100%; border-right:1px solid var(--border); white-space:nowrap; }
-.info-chip:first-child { padding-left:0; }
-.info-chip .label { color:var(--text-dim); }
-.info-chip .value { color:var(--text); font-weight:600; }
-#btn-edit { background:none; border:1px solid var(--border); color:var(--text-dim); font-family:inherit; font-size:.72rem; padding:5px 10px; border-radius:5px; cursor:pointer; margin-left:auto; transition:color .15s,border-color .15s; letter-spacing:.06em; white-space:nowrap; }
-#btn-edit:hover { color:var(--accent); border-color:var(--accent); }
+      /* INFO BAR */
+      #info-bar {
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        height: 42px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        font-size: 0.76rem;
+        color: var(--text-dim);
+        overflow: hidden;
+      }
+      .info-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 14px;
+        height: 100%;
+        border-right: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      .info-chip:first-child {
+        padding-left: 0;
+      }
+      .info-chip .label {
+        color: var(--text-dim);
+      }
+      .info-chip .value {
+        color: var(--text);
+        font-weight: 600;
+      }
+      #btn-edit {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        font-family: inherit;
+        font-size: 0.72rem;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: auto;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+      #btn-edit:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
 
-/* CANVAS */
-#canvas-area { flex:1; display:flex; align-items:center; justify-content:center; background:#050505; overflow:hidden; position:relative; }
-#canvas-wrapper { position:relative; transform-origin:center center; }
-#led-canvas { display:block; image-rendering:pixelated; }
+      /* CANVAS */
+      #canvas-area {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #050505;
+        overflow: hidden;
+        position: relative;
+      }
+      #canvas-wrapper {
+        position: relative;
+        transform-origin: center center;
+      }
+      #led-canvas {
+        display: block;
+        image-rendering: pixelated;
+      }
 
-/* CONFIG PANEL */
-#config-panel { background:var(--surface); border-top:1px solid var(--border); flex-shrink:0; overflow:hidden; max-height:0; transition:max-height .2s ease; }
-#config-panel.open { max-height:120px; }
-#config-inner { padding:10px 16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; min-height:60px; }
-.cfg-label { font-size:.68rem; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
-.cfg-input { background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:inherit; font-size:.8rem; padding:5px 8px; border-radius:5px; outline:none; }
-.cfg-input:focus { border-color:var(--accent); }
-.cfg-input[type=color] { padding:2px 4px; width:36px; height:28px; cursor:pointer; }
-.cfg-input[type=range] { width:90px; accent-color:var(--accent); }
-.cfg-sep { width:1px; height:28px; background:var(--border); flex-shrink:0; }
-.cfg-btn { background:var(--bg); border:1px solid var(--border); color:var(--text-dim); font-family:inherit; font-size:.72rem; padding:5px 9px; border-radius:5px; cursor:pointer; transition:all .15s; white-space:nowrap; }
-.cfg-btn:hover { color:var(--text); border-color:#444; }
-.cfg-btn.active { background:var(--accent); color:#000; border-color:var(--accent); font-weight:700; }
-.cfg-section { display:none; align-items:center; gap:10px; flex-wrap:wrap; }
-.cfg-section.active { display:flex; }
+      /* CONFIG PANEL */
+      #config-panel {
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.2s ease;
+      }
+      #config-panel.open {
+        max-height: 120px;
+      }
+      #config-inner {
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        min-height: 60px;
+      }
+      .cfg-label {
+        font-size: 0.68rem;
+        color: var(--text-dim);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .cfg-input {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.8rem;
+        padding: 5px 8px;
+        border-radius: 5px;
+        outline: none;
+      }
+      .cfg-input:focus {
+        border-color: var(--accent);
+      }
+      .cfg-input[type="color"] {
+        padding: 2px 4px;
+        width: 36px;
+        height: 28px;
+        cursor: pointer;
+      }
+      .cfg-input[type="range"] {
+        width: 90px;
+        accent-color: var(--accent);
+      }
+      .cfg-sep {
+        width: 1px;
+        height: 28px;
+        background: var(--border);
+        flex-shrink: 0;
+      }
+      .cfg-btn {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        font-family: inherit;
+        font-size: 0.72rem;
+        padding: 5px 9px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .cfg-btn:hover {
+        color: var(--text);
+        border-color: #444;
+      }
+      .cfg-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+      .cfg-section {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .cfg-section.active {
+        display: flex;
+      }
 
-/* Color sequence editor */
-#seq-list { display:flex; gap:6px; align-items:center; flex-wrap:nowrap; overflow-x:auto; max-width:480px; }
-.seq-entry { display:flex; flex-direction:column; align-items:center; gap:3px; flex-shrink:0; }
-.seq-swatch { width:28px; height:28px; border-radius:4px; border:1px solid var(--border); cursor:pointer; }
-.seq-dur { width:36px; font-size:.65rem; text-align:center; background:var(--bg); border:1px solid var(--border); border-radius:3px; color:var(--text-dim); font-family:inherit; padding:2px 0; }
-.seq-del { font-size:.65rem; color:var(--text-dim); cursor:pointer; line-height:1; }
-.seq-del:hover { color:var(--danger); }
+      /* Color sequence editor */
+      #seq-list {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        max-width: 480px;
+      }
+      .seq-entry {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        flex-shrink: 0;
+      }
+      .seq-swatch {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+      }
+      .seq-dur {
+        width: 36px;
+        font-size: 0.65rem;
+        text-align: center;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        color: var(--text-dim);
+        font-family: inherit;
+        padding: 2px 0;
+      }
+      .seq-del {
+        font-size: 0.65rem;
+        color: var(--text-dim);
+        cursor: pointer;
+        line-height: 1;
+      }
+      .seq-del:hover {
+        color: var(--danger);
+      }
 
-/* Image sequence */
-#img-frame-list { display:flex; gap:4px; align-items:center; max-width:400px; overflow-x:auto; }
-.img-thumb { position:relative; width:40px; height:28px; border-radius:3px; overflow:hidden; border:1px solid var(--border); cursor:pointer; flex-shrink:0; }
-.img-thumb img { width:100%; height:100%; object-fit:cover; }
-.img-thumb.active { border-color:var(--accent); }
-.img-thumb .img-del { position:absolute; top:0; right:0; background:rgba(0,0,0,.7); color:#fff; font-size:8px; padding:1px 3px; cursor:pointer; display:none; }
-.img-thumb:hover .img-del { display:block; }
+      /* Image sequence */
+      #img-frame-list {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        max-width: 400px;
+        overflow-x: auto;
+      }
+      .img-thumb {
+        position: relative;
+        width: 40px;
+        height: 28px;
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .img-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .img-thumb.active {
+        border-color: var(--accent);
+      }
+      .img-thumb .img-del {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-size: 8px;
+        padding: 1px 3px;
+        cursor: pointer;
+        display: none;
+      }
+      .img-thumb:hover .img-del {
+        display: block;
+      }
 
-/* TOOLBAR */
-#toolbar { display:flex; align-items:center; gap:10px; padding:0 16px; height:52px; background:var(--surface); border-top:1px solid var(--border); flex-shrink:0; overflow-x:auto; }
-.toolbar-group { display:flex; align-items:center; gap:4px; border-right:1px solid var(--border); padding-right:10px; }
-.toolbar-group:last-child { border-right:none; margin-left:auto; padding-right:0; }
-.tb-label { font-size:.7rem; color:var(--text-dim); margin-right:4px; white-space:nowrap; text-transform:uppercase; letter-spacing:.07em; }
-.tb-btn { background:var(--bg); border:1px solid var(--border); color:var(--text-dim); font-family:inherit; font-size:.75rem; padding:6px 11px; border-radius:5px; cursor:pointer; transition:all .15s; white-space:nowrap; letter-spacing:.04em; }
-.tb-btn:hover { color:var(--text); border-color:#444; }
-.tb-btn.active { background:var(--accent); color:#000; border-color:var(--accent); font-weight:700; }
-#play-btn { font-size:.85rem; min-width:36px; }
+      /* TOOLBAR */
+      #toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px;
+        height: 52px;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+        overflow-x: auto;
+      }
+      .toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        border-right: 1px solid var(--border);
+        padding-right: 10px;
+      }
+      .toolbar-group:last-child {
+        border-right: none;
+        margin-left: auto;
+        padding-right: 0;
+      }
+      .tb-label {
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        margin-right: 4px;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+      .tb-btn {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        font-family: inherit;
+        font-size: 0.75rem;
+        padding: 6px 11px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+        letter-spacing: 0.04em;
+      }
+      .tb-btn:hover {
+        color: var(--text);
+        border-color: #444;
+      }
+      .tb-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+      #play-btn {
+        font-size: 0.85rem;
+        min-width: 36px;
+      }
 
-/* EXPORT */
-#export-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); display:flex; align-items:center; justify-content:center; z-index:50; backdrop-filter:blur(4px); }
-#export-overlay.hidden { display:none; }
-#export-panel { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px 32px; width:380px; box-shadow:0 24px 80px rgba(0,0,0,.6); }
-#export-panel h3 { font-size:.95rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
-.ep-sub { color:var(--text-dim); font-size:.74rem; margin-bottom:18px; line-height:1.6; }
-.ep-section-label { font-size:.7rem; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
-.dur-group { display:flex; gap:6px; margin-bottom:18px; }
-.dur-btn { flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text-dim); font-family:inherit; font-size:.8rem; padding:8px 0; border-radius:5px; cursor:pointer; transition:all .15s; }
-.dur-btn:hover { color:var(--text); border-color:#444; }
-.dur-btn.active { background:var(--accent); color:#000; border-color:var(--accent); font-weight:700; }
-.ep-timeline { position:relative; height:40px; margin-bottom:6px; user-select:none; }
-.ep-track { position:absolute; top:50%; left:8px; right:8px; height:8px; transform:translateY(-50%); background:var(--border); border-radius:4px; }
-.ep-fill { position:absolute; top:0; height:100%; background:var(--accent2); border-radius:4px; opacity:.75; }
-.ep-handle { position:absolute; top:50%; width:16px; height:16px; background:#fff; border:2.5px solid var(--accent2); border-radius:50%; transform:translate(-50%,-50%); cursor:grab; box-shadow:0 1px 6px rgba(0,0,0,.5); z-index:2; }
-.ep-handle:hover,.ep-handle.dragging { box-shadow:0 0 0 4px rgba(255,107,53,.25); cursor:grabbing; }
-.ep-range-info { display:flex; justify-content:space-between; font-size:.72rem; color:var(--text-dim); margin-bottom:16px; }
-.ep-range-info #ep-dur-label { color:var(--accent2); font-weight:600; }
-#ep-record-btn { width:100%; padding:12px; background:var(--accent2); color:#fff; border:none; border-radius:var(--radius); font-family:inherit; font-size:.85rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:opacity .15s; margin-bottom:10px; }
-#ep-record-btn:hover { opacity:.9; }
-#ep-record-btn:disabled { opacity:.5; cursor:not-allowed; }
-#ep-progress-wrap { display:none; margin-bottom:10px; }
-#ep-progress-bar-bg { background:var(--border); border-radius:3px; height:6px; overflow:hidden; }
-#ep-progress-bar { background:var(--accent2); height:100%; width:0%; transition:width .25s linear; border-radius:3px; }
-#ep-status { font-size:.74rem; color:var(--text-dim); margin-top:8px; min-height:1.2em; text-align:center; }
-#ep-cancel-btn { width:100%; background:none; border:1px solid var(--border); color:var(--text-dim); font-family:inherit; font-size:.78rem; padding:8px; border-radius:5px; cursor:pointer; transition:all .15s; }
-#ep-cancel-btn:hover { color:var(--text); border-color:#555; }
-</style>
-</head>
-<body>
-
-<!-- SETUP MODAL -->
-<div id="modal-overlay">
-  <div id="modal">
-    <h2>LED Screen Setup</h2>
-    <p class="subtitle">Configure your screen specs to preview content at exact resolution</p>
-    <div class="field-group">
-      <div class="field"><label>Screen Width (m)</label><input type="number" id="inp-width" value="4" min="0.1" max="100" step="0.1"></div>
-      <div class="field"><label>Screen Height (m)</label><input type="number" id="inp-height" value="2" min="0.1" max="100" step="0.1"></div>
-    </div>
-    <div class="field">
-      <label>LED Pixel Pitch</label>
-      <select id="inp-pitch">
-        <option value="1.5">P1.5 — 1.5mm</option><option value="2">P2 — 2mm</option>
-        <option value="2.5">P2.5 — 2.5mm</option><option value="3">P3 — 3mm</option>
-        <option value="4" selected>P4 — 4mm</option><option value="5">P5 — 5mm</option>
-        <option value="6">P6 — 6mm</option><option value="8">P8 — 8mm</option>
-        <option value="10">P10 — 10mm</option><option value="16">P16 — 16mm</option>
-        <option value="20">P20 — 20mm</option>
-        <option value="custom">Custom…</option>
-      </select>
-      <input type="number" id="inp-pitch-custom" placeholder="Enter pitch in mm, e.g. 3.75"
-        min="0.1" max="100" step="0.01" style="display:none; margin-top:8px;">
-    </div>
-    <div id="modal-preview">
-      <div id="modal-resolution">Resolution: — × — px</div>
-      <div id="modal-pixels"></div>
-      <div id="modal-warning"></div>
-    </div>
-    <button id="btn-create">Create Content →</button>
-  </div>
-</div>
-
-<!-- INFO BAR -->
-<div id="info-bar">
-  <div class="info-chip"><span class="label">Pitch</span><span class="value" id="bar-pitch">—</span></div>
-  <div class="info-chip"><span class="label">Screen</span><span class="value" id="bar-size">—</span></div>
-  <div class="info-chip"><span class="label">Resolution</span><span class="value" id="bar-res">—</span></div>
-  <button id="btn-edit">✎ Edit</button>
-</div>
-
-<!-- CANVAS AREA -->
-<div id="canvas-area">
-  <div id="canvas-wrapper"><canvas id="led-canvas"></canvas></div>
-</div>
-
-<!-- CONFIG PANEL -->
-<div id="config-panel">
-  <div id="config-inner">
-
-    <!-- Color Test -->
-    <div class="cfg-section active" id="cfg-colortest">
-      <span class="cfg-label">Breathing</span>
-      <button class="cfg-btn active" id="cfg-breath-on">On</button>
-      <button class="cfg-btn" id="cfg-breath-off">Off</button>
-      <div class="cfg-sep"></div>
-      <span class="cfg-label">Cycle</span>
-      <button class="cfg-btn" id="cfg-cycle-btn">Space / Toggle</button>
-    </div>
-
-    <!-- Scrolling Text -->
-    <div class="cfg-section" id="cfg-scroll">
-      <span class="cfg-label">Text</span>
-      <input class="cfg-input" id="scroll-text" type="text" value="LED SCREEN" style="width:140px">
-      <div class="cfg-sep"></div>
-      <span class="cfg-label">Color</span>
-      <input class="cfg-input" id="scroll-color" type="color" value="#ffffff">
-      <div class="cfg-sep"></div>
-      <span class="cfg-label">BG</span>
-      <input class="cfg-input" id="scroll-bg" type="color" value="#000000">
-      <div class="cfg-sep"></div>
-      <span class="cfg-label">Size</span>
-      <input class="cfg-input" id="scroll-size" type="range" min="10" max="90" value="50">
-    </div>
-
-    <!-- Color Sequence -->
-    <div class="cfg-section" id="cfg-sequence">
-      <span class="cfg-label">Sequence</span>
-      <div id="seq-list"></div>
-      <button class="cfg-btn" id="seq-add">+ Add</button>
-      <div class="cfg-sep"></div>
-      <span class="cfg-label">Fade</span>
-      <button class="cfg-btn active" id="seq-fade-on">On</button>
-      <button class="cfg-btn" id="seq-fade-off">Off</button>
-    </div>
-
-    <!-- Moving Patterns -->
-    <div class="cfg-section" id="cfg-patterns">
-      <span class="cfg-label">Pattern</span>
-      <button class="cfg-btn active" data-pattern="pulse">Pulse</button>
-      <button class="cfg-btn" data-pattern="wave">Wave</button>
-      <button class="cfg-btn" data-pattern="sweep">Sweep</button>
-      <button class="cfg-btn" data-pattern="checker">Checker</button>
-      <button class="cfg-btn" data-pattern="sparkle">Sparkle</button>
-      <div class="cfg-sep"></div>
-      <span class="cfg-label">Color A</span>
-      <input class="cfg-input" id="pat-color1" type="color" value="#ff0000">
-      <span class="cfg-label">Color B</span>
-      <input class="cfg-input" id="pat-color2" type="color" value="#000000">
-    </div>
-
-    <!-- Image Sequence -->
-    <div class="cfg-section" id="cfg-images">
-      <span class="cfg-label">Frames</span>
-      <div id="img-frame-list"></div>
-      <label class="cfg-btn" style="cursor:pointer">
-        + Image <input type="file" id="img-upload" accept="image/*" multiple style="display:none">
-      </label>
-      <div class="cfg-sep"></div>
-      <span class="cfg-label">Frame dur (s)</span>
-      <input class="cfg-input" id="img-frame-dur" type="number" value="1" min="0.1" step="0.1" style="width:50px">
-    </div>
-
-  </div>
-</div>
-
-<!-- TOOLBAR -->
-<div id="toolbar">
-  <div class="toolbar-group">
-    <span class="tb-label">Mode</span>
-    <button class="tb-btn active" data-mode="colortest">Color Test</button>
-    <button class="tb-btn" data-mode="scroll">Scroll Text</button>
-    <button class="tb-btn" data-mode="sequence">Color Seq</button>
-    <button class="tb-btn" data-mode="patterns">Patterns</button>
-    <button class="tb-btn" data-mode="images">Images</button>
-  </div>
-  <div class="toolbar-group">
-    <button class="tb-btn active" id="play-btn">⏸</button>
-    <button class="tb-btn" id="fullscreen-btn">⛶ Full</button>
-  </div>
-  <div class="toolbar-group">
-    <button class="tb-btn" id="export-btn">⬇ Export</button>
-  </div>
-</div>
-
-<!-- EXPORT OVERLAY -->
-<div id="export-overlay" class="hidden">
-  <div id="export-panel">
-    <h3>Export Video</h3>
-    <p class="ep-sub">Set the loop length, drag handles to pick the range, then record.</p>
-    <div class="ep-section-label">Loop Duration</div>
-    <div class="dur-group">
-      <button class="dur-btn" data-loop="2">2s</button>
-      <button class="dur-btn active" data-loop="5">5s</button>
-      <button class="dur-btn" data-loop="10">10s</button>
-      <button class="dur-btn" data-loop="20">20s</button>
-    </div>
-    <div class="ep-section-label">Export Range</div>
-    <div class="ep-timeline">
-      <div class="ep-track" id="ep-track">
-        <div class="ep-fill" id="ep-fill"></div>
-        <div class="ep-handle" id="ep-handle-in"></div>
-        <div class="ep-handle" id="ep-handle-out"></div>
+      /* EXPORT */
+      #export-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        backdrop-filter: blur(4px);
+      }
+      #export-overlay.hidden {
+        display: none;
+      }
+      #export-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px 32px;
+        width: 380px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+      }
+      #export-panel h3 {
+        font-size: 0.95rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      .ep-sub {
+        color: var(--text-dim);
+        font-size: 0.74rem;
+        margin-bottom: 18px;
+        line-height: 1.6;
+      }
+      .ep-section-label {
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .dur-group {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 18px;
+      }
+      .dur-btn {
+        flex: 1;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        font-family: inherit;
+        font-size: 0.8rem;
+        padding: 8px 0;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .dur-btn:hover {
+        color: var(--text);
+        border-color: #444;
+      }
+      .dur-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+      .ep-timeline {
+        position: relative;
+        height: 40px;
+        margin-bottom: 6px;
+        user-select: none;
+      }
+      .ep-track {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        right: 8px;
+        height: 8px;
+        transform: translateY(-50%);
+        background: var(--border);
+        border-radius: 4px;
+      }
+      .ep-fill {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        background: var(--accent2);
+        border-radius: 4px;
+        opacity: 0.75;
+      }
+      .ep-handle {
+        position: absolute;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        background: #fff;
+        border: 2.5px solid var(--accent2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        cursor: grab;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+        z-index: 2;
+      }
+      .ep-handle:hover,
+      .ep-handle.dragging {
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.25);
+        cursor: grabbing;
+      }
+      .ep-range-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        margin-bottom: 16px;
+      }
+      .ep-range-info #ep-dur-label {
+        color: var(--accent2);
+        font-weight: 600;
+      }
+      #ep-record-btn {
+        width: 100%;
+        padding: 12px;
+        background: var(--accent2);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: opacity 0.15s;
+        margin-bottom: 10px;
+      }
+      #ep-record-btn:hover {
+        opacity: 0.9;
+      }
+      #ep-record-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      #ep-progress-wrap {
+        display: none;
+        margin-bottom: 10px;
+      }
+      #ep-progress-bar-bg {
+        background: var(--border);
+        border-radius: 3px;
+        height: 6px;
+        overflow: hidden;
+      }
+      #ep-progress-bar {
+        background: var(--accent2);
+        height: 100%;
+        width: 0%;
+        transition: width 0.25s linear;
+        border-radius: 3px;
+      }
+      #ep-status {
+        font-size: 0.74rem;
+        color: var(--text-dim);
+        margin-top: 8px;
+        min-height: 1.2em;
+        text-align: center;
+      }
+      #ep-cancel-btn {
+        width: 100%;
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        font-family: inherit;
+        font-size: 0.78rem;
+        padding: 8px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      #ep-cancel-btn:hover {
+        color: var(--text);
+        border-color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SETUP MODAL -->
+    <div id="modal-overlay">
+      <div id="modal">
+        <h2>LED Screen Setup</h2>
+        <p class="subtitle">
+          Configure your screen specs to preview content at exact resolution
+        </p>
+        <div class="field-group">
+          <div class="field">
+            <label>Screen Width (m)</label
+            ><input
+              type="number"
+              id="inp-width"
+              value="4"
+              min="0.1"
+              max="100"
+              step="0.1"
+            />
+          </div>
+          <div class="field">
+            <label>Screen Height (m)</label
+            ><input
+              type="number"
+              id="inp-height"
+              value="2"
+              min="0.1"
+              max="100"
+              step="0.1"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label>LED Pixel Pitch</label>
+          <select id="inp-pitch">
+            <option value="1.5">P1.5 — 1.5mm</option>
+            <option value="2">P2 — 2mm</option>
+            <option value="2.5">P2.5 — 2.5mm</option>
+            <option value="3">P3 — 3mm</option>
+            <option value="4" selected>P4 — 4mm</option>
+            <option value="5">P5 — 5mm</option>
+            <option value="6">P6 — 6mm</option>
+            <option value="8">P8 — 8mm</option>
+            <option value="10">P10 — 10mm</option>
+            <option value="16">P16 — 16mm</option>
+            <option value="20">P20 — 20mm</option>
+            <option value="custom">Custom…</option>
+          </select>
+          <input
+            type="number"
+            id="inp-pitch-custom"
+            placeholder="Enter pitch in mm, e.g. 3.75"
+            min="0.1"
+            max="100"
+            step="0.01"
+            style="display: none; margin-top: 8px"
+          />
+        </div>
+        <div id="modal-preview">
+          <div id="modal-resolution">Resolution: — × — px</div>
+          <div id="modal-pixels"></div>
+          <div id="modal-warning"></div>
+        </div>
+        <button id="btn-create">Create Content →</button>
       </div>
     </div>
-    <div class="ep-range-info">
-      <span id="ep-in-label">In: 0.00s</span>
-      <span id="ep-dur-label">5.00s</span>
-      <span id="ep-out-label">Out: 5.00s</span>
+
+    <!-- INFO BAR -->
+    <div id="info-bar">
+      <div class="info-chip">
+        <span class="label">Pitch</span
+        ><span class="value" id="bar-pitch">—</span>
+      </div>
+      <div class="info-chip">
+        <span class="label">Screen</span
+        ><span class="value" id="bar-size">—</span>
+      </div>
+      <div class="info-chip">
+        <span class="label">Resolution</span
+        ><span class="value" id="bar-res">—</span>
+      </div>
+      <button id="btn-edit">✎ Edit</button>
     </div>
-    <button id="ep-record-btn">⏺ Record 5.00s</button>
-    <div id="ep-progress-wrap">
-      <div id="ep-progress-bar-bg"><div id="ep-progress-bar"></div></div>
-      <div id="ep-status"></div>
+
+    <!-- CANVAS AREA -->
+    <div id="canvas-area">
+      <div id="canvas-wrapper"><canvas id="led-canvas"></canvas></div>
     </div>
-    <button id="ep-cancel-btn">Cancel</button>
-  </div>
-</div>
 
-<script>
-// ── ScreenConfig ──────────────────────────────────────────────────────────────
-class ScreenConfig {
-  constructor(w, h, p) { this.widthM = w; this.heightM = h; this.pitchMm = p; }
-  get pixelsWide() { return Math.round((this.widthM  * 1000) / this.pitchMm); }
-  get pixelsTall()  { return Math.round((this.heightM * 1000) / this.pitchMm); }
-  get pitchLabel()  { return `P${this.pitchMm}`; }
-}
+    <!-- CONFIG PANEL -->
+    <div id="config-panel">
+      <div id="config-inner">
+        <!-- Color Test -->
+        <div class="cfg-section active" id="cfg-colortest">
+          <span class="cfg-label">Breathing</span>
+          <button class="cfg-btn active" id="cfg-breath-on">On</button>
+          <button class="cfg-btn" id="cfg-breath-off">Off</button>
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">Cycle</span>
+          <button class="cfg-btn" id="cfg-cycle-btn">Space / Toggle</button>
+        </div>
 
-// ── ScaleManager ──────────────────────────────────────────────────────────────
-class ScaleManager {
-  constructor(area, wrapper, canvas) { this.area = area; this.wrapper = wrapper; this.canvas = canvas; }
-  update() {
-    const aW = this.area.clientWidth - 40, aH = this.area.clientHeight - 40;
-    const cW = this.canvas.width,         cH = this.canvas.height;
-    if (!cW || !cH) return;
-    const scale = Math.min(aW / cW, aH / cH, 1);
-    this.wrapper.style.width  = cW + 'px';
-    this.wrapper.style.height = cH + 'px';
-    this.wrapper.style.transform = `scale(${scale})`;
-  }
-}
+        <!-- Scrolling Text -->
+        <div class="cfg-section" id="cfg-scroll">
+          <span class="cfg-label">Text</span>
+          <input
+            class="cfg-input"
+            id="scroll-text"
+            type="text"
+            value="LED SCREEN"
+            style="width: 140px"
+          />
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">Color</span>
+          <input
+            class="cfg-input"
+            id="scroll-color"
+            type="color"
+            value="#ffffff"
+          />
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">BG</span>
+          <input
+            class="cfg-input"
+            id="scroll-bg"
+            type="color"
+            value="#000000"
+          />
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">Size</span>
+          <input
+            class="cfg-input"
+            id="scroll-size"
+            type="range"
+            min="10"
+            max="90"
+            value="50"
+          />
+        </div>
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-  return [r, g, b];
-}
-function lerpColor(c1, c2, t) {
-  const [r1,g1,b1] = hexToRgb(c1), [r2,g2,b2] = hexToRgb(c2);
-  return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
-}
+        <!-- Color Sequence -->
+        <div class="cfg-section" id="cfg-sequence">
+          <span class="cfg-label">Sequence</span>
+          <div id="seq-list"></div>
+          <button class="cfg-btn" id="seq-add">+ Add</button>
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">Fade</span>
+          <button class="cfg-btn active" id="seq-fade-on">On</button>
+          <button class="cfg-btn" id="seq-fade-off">Off</button>
+        </div>
 
-// ── ColorTestPattern ──────────────────────────────────────────────────────────
-class ColorTestPattern {
-  constructor(canvas) {
-    this.canvas = canvas; this.ctx = canvas.getContext('2d');
-    this.t = 0; this.loopFrames = 300;
-    this.cycling = false; this.cycleIndex = 0;
-    this.cycleColors = ['#ff0000','#00ff00','#0000ff','#ffffff','#000000'];
-    this.cycleTimer = 0; this.cycleDur = 90;
-    this.breathing = true;
-  }
-  setLoopDuration(sec) { this.loopFrames = Math.max(1, Math.round(sec * 60)); this.t %= this.loopFrames; }
-  seekToTime(sec)       { this.t = Math.round(sec * 60) % this.loopFrames; }
-  toggleCycle()         { this.cycling = !this.cycling; this.cycleIndex = 0; this.cycleTimer = 0; }
+        <!-- Moving Patterns -->
+        <div class="cfg-section" id="cfg-patterns">
+          <span class="cfg-label">Pattern</span>
+          <button class="cfg-btn active" data-pattern="pulse">Pulse</button>
+          <button class="cfg-btn" data-pattern="wave">Wave</button>
+          <button class="cfg-btn" data-pattern="sweep">Sweep</button>
+          <button class="cfg-btn" data-pattern="checker">Checker</button>
+          <button class="cfg-btn" data-pattern="sparkle">Sparkle</button>
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">Color A</span>
+          <input
+            class="cfg-input"
+            id="pat-color1"
+            type="color"
+            value="#ff0000"
+          />
+          <span class="cfg-label">Color B</span>
+          <input
+            class="cfg-input"
+            id="pat-color2"
+            type="color"
+            value="#000000"
+          />
+        </div>
 
-  draw(animating) {
-    const { canvas, ctx } = this;
-    const W = canvas.width, H = canvas.height;
-    if (this.cycling) {
-      this._drawCycle(W, H);
-      if (animating) { this.cycleTimer++; if (this.cycleTimer >= this.cycleDur) { this.cycleTimer = 0; this.cycleIndex = (this.cycleIndex + 1) % this.cycleColors.length; } }
-      return;
-    }
-    this._drawBars(W, H, animating);
-    this._drawGray(W, H);
-    this._drawStrip(W, H);
-    this._drawOverlays(W, H);
-    if (animating) this.t = (this.t + 1) % this.loopFrames;
-  }
+        <!-- Image Sequence -->
+        <div class="cfg-section" id="cfg-images">
+          <span class="cfg-label">Frames</span>
+          <div id="img-frame-list"></div>
+          <label class="cfg-btn" style="cursor: pointer">
+            + Image
+            <input
+              type="file"
+              id="img-upload"
+              accept="image/*"
+              multiple
+              style="display: none"
+            />
+          </label>
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">Frame dur (s)</span>
+          <input
+            class="cfg-input"
+            id="img-frame-dur"
+            type="number"
+            value="1"
+            min="0.1"
+            step="0.1"
+            style="width: 50px"
+          />
+        </div>
+      </div>
+    </div>
 
-  _drawBars(W, H, animating) {
-    const colors = [[255,255,255],[255,255,0],[0,255,255],[0,255,0],[255,0,255],[255,0,0],[0,0,255]];
-    const barH = Math.floor(H * .6), barW = W / colors.length;
-    const breath = (animating && this.breathing) ? 1 + .05 * Math.sin(this.t * (2*Math.PI/120)) : 1;
-    colors.forEach(([r,g,b], i) => {
-      this.ctx.fillStyle = `rgb(${Math.min(255,Math.round(r*breath))},${Math.min(255,Math.round(g*breath))},${Math.min(255,Math.round(b*breath))})`;
-      this.ctx.fillRect(Math.floor(i*barW), 0, Math.ceil(barW), barH);
-    });
-  }
-  _drawGray(W, H) {
-    const topY = Math.floor(H*.6), rampH = Math.floor(H*.15);
-    for (let i=0; i<8; i++) {
-      const v = Math.round(i/7*255);
-      this.ctx.fillStyle = `rgb(${v},${v},${v})`;
-      this.ctx.fillRect(Math.floor(i*W/8), topY, Math.ceil(W/8), rampH);
-    }
-  }
-  _drawStrip(W, H) {
-    const topY = Math.floor(H*.75), h = H-topY, t = Math.floor(W/3);
-    this.ctx.fillStyle='#000'; this.ctx.fillRect(0,topY,t,h);
-    this.ctx.fillStyle='#f00'; this.ctx.fillRect(t,topY,t,h);
-    this.ctx.fillStyle='#fff'; this.ctx.fillRect(t*2,topY,W-t*2,h);
-  }
-  _drawOverlays(W, H) {
-    const ctx = this.ctx;
-    ctx.strokeStyle='rgba(255,255,255,.1)'; ctx.lineWidth=1;
-    for (let x=0;x<=W;x+=10) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for (let y=0;y<=H;y+=10) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-    ctx.strokeStyle='rgba(255,255,255,.7)';
-    const cx=Math.floor(W/2)+.5, cy=Math.floor(H/2)+.5, arm=Math.min(W,H)*.05;
-    ctx.beginPath(); ctx.moveTo(cx-arm,cy); ctx.lineTo(cx+arm,cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx,cy-arm); ctx.lineTo(cx,cy+arm); ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.8)'; ctx.fillRect(cx-1,cy-1,2,2);
-    const m=20, th=2; ctx.fillStyle='rgba(255,255,255,.85)';
-    [[0,0,1,1],[W,0,-1,1],[0,H,1,-1],[W,H,-1,-1]].forEach(([x,y,sx,sy]) => {
-      ctx.fillRect(x,y,sx*m,sy*th); ctx.fillRect(x,y,sx*th,sy*m);
-    });
-    const cfg = app.config;
-    if (cfg) {
-      ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fillRect(6,6,200,38);
-      ctx.fillStyle='rgba(255,255,255,.9)'; ctx.font=`${Math.max(9,Math.min(14,W/80))}px monospace`;
-      ctx.fillText(`${cfg.pixelsWide} × ${cfg.pixelsTall} px`,12,22);
-      ctx.fillText(`${cfg.pitchLabel}  ${cfg.widthM}m × ${cfg.heightM}m`,12,38);
-    }
-  }
-  _drawCycle(W, H) {
-    const color = this.cycleColors[this.cycleIndex];
-    this.ctx.fillStyle = color; this.ctx.fillRect(0,0,W,H);
-    this.ctx.fillStyle = color==='#000000'?'rgba(255,255,255,.5)':'rgba(0,0,0,.5)';
-    this.ctx.font=`bold ${Math.max(16,Math.min(48,W/20))}px monospace`;
-    this.ctx.textAlign='center'; this.ctx.textBaseline='middle';
-    this.ctx.fillText(['RED','GREEN','BLUE','WHITE','BLACK'][this.cycleIndex],W/2,H/2);
-    this.ctx.textAlign='left'; this.ctx.textBaseline='alphabetic';
-  }
-}
+    <!-- TOOLBAR -->
+    <div id="toolbar">
+      <div class="toolbar-group">
+        <span class="tb-label">Mode</span>
+        <button class="tb-btn active" data-mode="colortest">Color Test</button>
+        <button class="tb-btn" data-mode="scroll">Scroll Text</button>
+        <button class="tb-btn" data-mode="sequence">Color Seq</button>
+        <button class="tb-btn" data-mode="patterns">Patterns</button>
+        <button class="tb-btn" data-mode="images">Images</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="tb-btn active" id="play-btn">⏸</button>
+        <button class="tb-btn" id="fullscreen-btn">⛶ Full</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="tb-btn" id="export-btn">⬇ Export</button>
+      </div>
+    </div>
 
-// ── ScrollingTextAnim ─────────────────────────────────────────────────────────
-class ScrollingTextAnim {
-  constructor(canvas) {
-    this.canvas = canvas; this.ctx = canvas.getContext('2d');
-    this.text = 'LED SCREEN'; this.color = '#ffffff'; this.bgColor = '#000000';
-    this.sizePct = 50; this.t = 0; this.loopFrames = 300;
-  }
-  setLoopDuration(sec) { this.loopFrames = Math.max(1, Math.round(sec * 60)); this.t %= this.loopFrames; }
-  seekToTime(sec)       { this.t = Math.round(sec * 60) % this.loopFrames; }
+    <!-- EXPORT OVERLAY -->
+    <div id="export-overlay" class="hidden">
+      <div id="export-panel">
+        <h3>Export Video</h3>
+        <p class="ep-sub">
+          Set the loop length, drag handles to pick the range, then record.
+        </p>
+        <div class="ep-section-label">Loop Duration</div>
+        <div class="dur-group">
+          <button class="dur-btn" data-loop="2">2s</button>
+          <button class="dur-btn active" data-loop="5">5s</button>
+          <button class="dur-btn" data-loop="10">10s</button>
+          <button class="dur-btn" data-loop="20">20s</button>
+        </div>
+        <div class="ep-section-label">Export Range</div>
+        <div class="ep-timeline">
+          <div class="ep-track" id="ep-track">
+            <div class="ep-fill" id="ep-fill"></div>
+            <div class="ep-handle" id="ep-handle-in"></div>
+            <div class="ep-handle" id="ep-handle-out"></div>
+          </div>
+        </div>
+        <div class="ep-range-info">
+          <span id="ep-in-label">In: 0.00s</span>
+          <span id="ep-dur-label">5.00s</span>
+          <span id="ep-out-label">Out: 5.00s</span>
+        </div>
+        <button id="ep-record-btn">⏺ Record 5.00s</button>
+        <div id="ep-progress-wrap">
+          <div id="ep-progress-bar-bg"><div id="ep-progress-bar"></div></div>
+          <div id="ep-status"></div>
+        </div>
+        <button id="ep-cancel-btn">Cancel</button>
+      </div>
+    </div>
 
-  draw(animating) {
-    const { canvas, ctx } = this;
-    const W = canvas.width, H = canvas.height;
-    ctx.fillStyle = this.bgColor; ctx.fillRect(0,0,W,H);
-    const fontSize = Math.max(12, Math.round(H * this.sizePct / 100));
-    ctx.font = `bold ${fontSize}px monospace`;
-    const tw = ctx.measureText(this.text).width;
-    const totalTravel = W + tw;
-    const x = W - (this.t / this.loopFrames) * totalTravel;
-    ctx.fillStyle = this.color; ctx.textBaseline = 'middle';
-    ctx.fillText(this.text, x, H / 2);
-    ctx.textBaseline = 'alphabetic';
-    if (animating) this.t = (this.t + 1) % this.loopFrames;
-  }
-}
-
-// ── ColorSequenceAnim ─────────────────────────────────────────────────────────
-class ColorSequenceAnim {
-  constructor(canvas) {
-    this.canvas = canvas; this.ctx = canvas.getContext('2d');
-    this.sequence = [
-      { color:'#ff0000', duration:1 }, { color:'#00ff00', duration:1 },
-      { color:'#0000ff', duration:1 }, { color:'#ffffff', duration:1 },
-    ];
-    this.fade = true; this.t = 0; this.loopFrames = 300;
-  }
-  setLoopDuration(sec) { this.loopFrames = Math.max(1, Math.round(sec * 60)); this.t %= this.loopFrames; }
-  seekToTime(sec)       { this.t = Math.round(sec * 60) % this.loopFrames; }
-
-  _color() {
-    const seq = this.sequence;
-    if (!seq.length) return '#000';
-    const totalDur = seq.reduce((s,e) => s + e.duration, 0);
-    if (totalDur === 0) return seq[0].color;
-    const timeSec = (this.t / this.loopFrames) * totalDur;
-    let elapsed = 0;
-    for (let i = 0; i < seq.length; i++) {
-      const e = seq[i];
-      if (timeSec < elapsed + e.duration) {
-        if (!this.fade) return e.color;
-        const localT = (timeSec - elapsed) / e.duration;
-        if (localT > 0.8) {
-          const next = seq[(i+1) % seq.length].color;
-          return lerpColor(e.color, next, (localT - 0.8) / 0.2);
+    <script>
+      // ── ScreenConfig ──────────────────────────────────────────────────────────────
+      class ScreenConfig {
+        constructor(w, h, p) {
+          this.widthM = w;
+          this.heightM = h;
+          this.pitchMm = p;
         }
-        return e.color;
-      }
-      elapsed += e.duration;
-    }
-    return seq[seq.length-1].color;
-  }
-
-  draw(animating) {
-    this.ctx.fillStyle = this._color();
-    this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
-    if (animating) this.t = (this.t + 1) % this.loopFrames;
-  }
-}
-
-// ── MovingPatternsAnim ────────────────────────────────────────────────────────
-class MovingPatternsAnim {
-  constructor(canvas) {
-    this.canvas = canvas; this.ctx = canvas.getContext('2d');
-    this.pattern = 'pulse'; this.color1 = '#ff0000'; this.color2 = '#000000';
-    this.t = 0; this.loopFrames = 300;
-    this._sparks = [];
-  }
-  setLoopDuration(sec) { this.loopFrames = Math.max(1, Math.round(sec * 60)); this.t %= this.loopFrames; }
-  seekToTime(sec)       { this.t = Math.round(sec * 60) % this.loopFrames; }
-
-  draw(animating) {
-    const { canvas, ctx, t, loopFrames } = this;
-    const W = canvas.width, H = canvas.height;
-    const phase = (t / loopFrames); // 0–1
-
-    ctx.fillStyle = this.color2; ctx.fillRect(0,0,W,H);
-
-    switch (this.pattern) {
-      case 'pulse':   this._pulse(W, H, phase); break;
-      case 'wave':    this._wave(W, H, phase);  break;
-      case 'sweep':   this._sweep(W, H, phase); break;
-      case 'checker': this._checker(W, H, phase); break;
-      case 'sparkle': this._sparkle(W, H, phase, animating); break;
-    }
-    if (animating) this.t = (this.t + 1) % this.loopFrames;
-  }
-
-  _pulse(W, H, phase) {
-    const brightness = (Math.sin(phase * 2 * Math.PI) + 1) / 2;
-    const [r,g,b] = hexToRgb(this.color1);
-    this.ctx.fillStyle = `rgb(${Math.round(r*brightness)},${Math.round(g*brightness)},${Math.round(b*brightness)})`;
-    this.ctx.fillRect(0,0,W,H);
-  }
-  _wave(W, H, phase) {
-    const ctx = this.ctx;
-    const bands = 6;
-    for (let i = 0; i < W; i++) {
-      const wavePhase = (i/W + phase) % 1;
-      const brightness = (Math.sin(wavePhase * 2 * Math.PI * bands) + 1) / 2;
-      const [r,g,b] = hexToRgb(this.color1);
-      ctx.fillStyle = `rgb(${Math.round(r*brightness)},${Math.round(g*brightness)},${Math.round(b*brightness)})`;
-      ctx.fillRect(i,0,1,H);
-    }
-  }
-  _sweep(W, H, phase) {
-    const x = Math.round(phase * W);
-    const grad = this.ctx.createLinearGradient(0,0,W,0);
-    const [r,g,b] = hexToRgb(this.color1);
-    grad.addColorStop(Math.max(0, (x-20)/W), this.color2);
-    grad.addColorStop(Math.min(1, x/W),       this.color1);
-    grad.addColorStop(Math.min(1, (x+20)/W),  this.color2);
-    this.ctx.fillStyle = grad;
-    this.ctx.fillRect(0,0,W,H);
-  }
-  _checker(W, H, phase) {
-    const ctx = this.ctx;
-    const size = Math.max(4, Math.round(Math.min(W,H) / 16));
-    const offset = Math.round(phase * size * 2);
-    for (let y = 0; y < H; y += size) {
-      for (let x = 0; x < W; x += size) {
-        const col = Math.floor((x + offset) / size) + Math.floor(y / size);
-        ctx.fillStyle = col % 2 === 0 ? this.color1 : this.color2;
-        ctx.fillRect(x,y,size,size);
-      }
-    }
-  }
-  _sparkle(W, H, phase, animating) {
-    const ctx = this.ctx;
-    const [r,g,b] = hexToRgb(this.color1);
-    if (animating && Math.random() < 0.4) {
-      this._sparks.push({ x: Math.random()*W, y: Math.random()*H, life: 1 });
-    }
-    this._sparks = this._sparks.filter(s => s.life > 0);
-    this._sparks.forEach(s => {
-      ctx.fillStyle = `rgba(${r},${g},${b},${s.life})`;
-      const sz = Math.max(1, Math.round(s.life * 4));
-      ctx.fillRect(s.x - sz/2, s.y - sz/2, sz, sz);
-      s.life -= 0.04;
-    });
-  }
-}
-
-// ── ImageSequenceAnim ─────────────────────────────────────────────────────────
-class ImageSequenceAnim {
-  constructor(canvas) {
-    this.canvas = canvas; this.ctx = canvas.getContext('2d');
-    this.frames = []; // [{ img, duration }]
-    this.frameDur = 1; // seconds per frame default
-    this.t = 0; this.loopFrames = 300;
-  }
-  setLoopDuration(sec) { this.loopFrames = Math.max(1, Math.round(sec * 60)); this.t %= this.loopFrames; }
-  seekToTime(sec)       { this.t = Math.round(sec * 60) % this.loopFrames; }
-
-  draw(animating) {
-    const { canvas, ctx } = this;
-    const W = canvas.width, H = canvas.height;
-    ctx.fillStyle = '#000'; ctx.fillRect(0,0,W,H);
-
-    if (!this.frames.length) {
-      ctx.fillStyle = 'rgba(255,255,255,.3)'; ctx.font = `${Math.max(10, W/30)}px monospace`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('Upload images to start', W/2, H/2);
-      ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-      return;
-    }
-
-    const totalDur = this.frames.reduce((s,f) => s + f.duration, 0);
-    const timeSec  = (this.t / this.loopFrames) * totalDur;
-    let elapsed = 0, frame = this.frames[this.frames.length - 1];
-    for (const f of this.frames) {
-      if (timeSec < elapsed + f.duration) { frame = f; break; }
-      elapsed += f.duration;
-    }
-
-    // Draw image fitted to canvas
-    const img = frame.img;
-    const scale = Math.min(W / img.naturalWidth, H / img.naturalHeight);
-    const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
-    ctx.drawImage(img, (W-dw)/2, (H-dh)/2, dw, dh);
-
-    if (animating) this.t = (this.t + 1) % this.loopFrames;
-  }
-}
-
-// ── ContentManager ────────────────────────────────────────────────────────────
-class ContentManager {
-  constructor(canvas) {
-    this.canvas   = canvas;
-    this.mode     = 'colortest';
-    this.colorTest = new ColorTestPattern(canvas);
-    this.scroll    = new ScrollingTextAnim(canvas);
-    this.sequence  = new ColorSequenceAnim(canvas);
-    this.patterns  = new MovingPatternsAnim(canvas);
-    this.images    = new ImageSequenceAnim(canvas);
-  }
-
-  _active() {
-    return { colortest:this.colorTest, scroll:this.scroll, sequence:this.sequence, patterns:this.patterns, images:this.images }[this.mode];
-  }
-
-  setMode(mode)               { this.mode = mode; }
-  setLoopDuration(sec)        { Object.values(this).filter(v=>v && typeof v.setLoopDuration==='function').forEach(v=>v.setLoopDuration(sec)); }
-  seekToTime(sec)             { this._active().seekToTime(sec); }
-  toggleCycle()               { this.colorTest.toggleCycle(); }
-  draw(animating)             { this._active().draw(animating); }
-}
-
-// ── App ───────────────────────────────────────────────────────────────────────
-const app = {
-  config: null, content: null, scaler: null,
-  animating: true, raf: null,
-  recording: false, recordingBitrateMbps: 10,
-  fpsCounter: 0, currentFps: 0, fpsLastTime: 0,
-
-  init() {
-    this.canvas  = document.getElementById('led-canvas');
-    this.area    = document.getElementById('canvas-area');
-    this.wrapper = document.getElementById('canvas-wrapper');
-    this.content = new ContentManager(this.canvas);
-    this.scaler  = new ScaleManager(this.area, this.wrapper, this.canvas);
-    this._bindModal();
-    this._bindToolbar();
-    this._bindConfigPanel();
-    this._bindKeys();
-    this._bindExport();
-    window.addEventListener('resize', () => this.scaler.update());
-    this._updateModalPreview();
-  },
-
-  // ─── Modal ───
-  _getPitch() {
-    const pEl = document.getElementById('inp-pitch');
-    if (pEl.value === 'custom') return parseFloat(document.getElementById('inp-pitch-custom').value);
-    return parseFloat(pEl.value);
-  },
-
-  _bindModal() {
-    const wEl          = document.getElementById('inp-width');
-    const hEl          = document.getElementById('inp-height');
-    const pEl          = document.getElementById('inp-pitch');
-    const pCustomEl    = document.getElementById('inp-pitch-custom');
-
-    const onPitchChange = () => {
-      const isCustom = pEl.value === 'custom';
-      pCustomEl.style.display = isCustom ? 'block' : 'none';
-      if (isCustom) pCustomEl.focus();
-      this._updateModalPreview();
-    };
-
-    pEl.addEventListener('change', onPitchChange);
-    [wEl, hEl, pCustomEl].forEach(el => el.addEventListener('input', () => this._updateModalPreview()));
-
-    document.getElementById('btn-create').addEventListener('click', () => {
-      const w = parseFloat(wEl.value), h = parseFloat(hEl.value), p = this._getPitch();
-      if (!w||!h||!p||w<=0||h<=0||p<=0) return;
-      this.config = new ScreenConfig(w,h,p);
-      this._applyConfig();
-      document.getElementById('modal-overlay').classList.add('hidden');
-    });
-
-    const knownPitches = [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 16, 20];
-    document.getElementById('btn-edit').addEventListener('click', () => {
-      if (this.config) {
-        wEl.value = this.config.widthM; hEl.value = this.config.heightM;
-        if (knownPitches.includes(this.config.pitchMm)) {
-          pEl.value = this.config.pitchMm;
-          pCustomEl.style.display = 'none';
-        } else {
-          pEl.value = 'custom';
-          pCustomEl.value = this.config.pitchMm;
-          pCustomEl.style.display = 'block';
+        get pixelsWide() {
+          return Math.round((this.widthM * 1000) / this.pitchMm);
         }
-        this._updateModalPreview();
+        get pixelsTall() {
+          return Math.round((this.heightM * 1000) / this.pitchMm);
+        }
+        get pitchLabel() {
+          return `P${this.pitchMm}`;
+        }
       }
-      document.getElementById('modal-overlay').classList.remove('hidden');
-    });
-  },
 
-  _updateModalPreview() {
-    const w = parseFloat(document.getElementById('inp-width').value);
-    const h = parseFloat(document.getElementById('inp-height').value);
-    const p = this._getPitch();
-    const resEl = document.getElementById('modal-resolution');
-    const warnEl = document.getElementById('modal-warning');
-    const pxEl  = document.getElementById('modal-pixels');
-    if (!w||!h||!p||w<=0||h<=0) { resEl.textContent='Resolution: — × — px'; warnEl.textContent=''; pxEl.textContent=''; return; }
-    const pw = Math.round(w*1000/p), ph = Math.round(h*1000/p);
-    resEl.textContent = `Resolution: ${pw} × ${ph} px`;
-    pxEl.textContent  = `Total: ${(pw*ph).toLocaleString()} pixels`;
-    warnEl.textContent = pw>5000||ph>5000 ? '⚠ Very high resolution — may be slow' : pw<10||ph<10 ? '⚠ Resolution very low' : '';
-  },
+      // ── ScaleManager ──────────────────────────────────────────────────────────────
+      class ScaleManager {
+        constructor(area, wrapper, canvas) {
+          this.area = area;
+          this.wrapper = wrapper;
+          this.canvas = canvas;
+        }
+        update() {
+          const aW = this.area.clientWidth - 40,
+            aH = this.area.clientHeight - 40;
+          const cW = this.canvas.width,
+            cH = this.canvas.height;
+          if (!cW || !cH) return;
+          const scale = Math.min(aW / cW, aH / cH, 1);
+          this.wrapper.style.width = cW + "px";
+          this.wrapper.style.height = cH + "px";
+          this.wrapper.style.transform = `scale(${scale})`;
+        }
+      }
 
-  _applyConfig() {
-    const cfg = this.config;
-    this.canvas.width  = cfg.pixelsWide;
-    this.canvas.height = cfg.pixelsTall;
-    document.getElementById('bar-pitch').textContent = cfg.pitchLabel;
-    document.getElementById('bar-size').textContent  = `${cfg.widthM}m × ${cfg.heightM}m`;
-    document.getElementById('bar-res').textContent   = `${cfg.pixelsWide} × ${cfg.pixelsTall} px`;
-    this.scaler.update();
-    this._startLoop();
-  },
+      // ── Helpers ───────────────────────────────────────────────────────────────────
+      function hexToRgb(hex) {
+        const r = parseInt(hex.slice(1, 3), 16),
+          g = parseInt(hex.slice(3, 5), 16),
+          b = parseInt(hex.slice(5, 7), 16);
+        return [r, g, b];
+      }
+      function lerpColor(c1, c2, t) {
+        const [r1, g1, b1] = hexToRgb(c1),
+          [r2, g2, b2] = hexToRgb(c2);
+        return `rgb(${Math.round(r1 + (r2 - r1) * t)},${Math.round(g1 + (g2 - g1) * t)},${Math.round(b1 + (b2 - b1) * t)})`;
+      }
 
-  // ─── Toolbar ───
-  _bindToolbar() {
-    const configPanel = document.getElementById('config-panel');
-    document.querySelectorAll('[data-mode]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.content.setMode(btn.dataset.mode);
-        // Show config section
-        document.querySelectorAll('.cfg-section').forEach(s => s.classList.remove('active'));
-        const sec = document.getElementById('cfg-' + btn.dataset.mode);
-        if (sec) { sec.classList.add('active'); configPanel.classList.add('open'); }
-        this._render();
-      });
-    });
+      // ── ColorTestPattern ──────────────────────────────────────────────────────────
+      class ColorTestPattern {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.t = 0;
+          this.loopFrames = 300;
+          this.cycling = false;
+          this.cycleIndex = 0;
+          this.cycleColors = [
+            "#ff0000",
+            "#00ff00",
+            "#0000ff",
+            "#ffffff",
+            "#000000",
+          ];
+          this.cycleTimer = 0;
+          this.cycleDur = 90;
+          this.breathing = true;
+        }
+        setLoopDuration(sec) {
+          this.loopFrames = Math.max(1, Math.round(sec * 60));
+          this.t %= this.loopFrames;
+        }
+        seekToTime(sec) {
+          this.t = Math.round(sec * 60) % this.loopFrames;
+        }
+        toggleCycle() {
+          this.cycling = !this.cycling;
+          this.cycleIndex = 0;
+          this.cycleTimer = 0;
+        }
 
-    const playBtn = document.getElementById('play-btn');
-    playBtn.addEventListener('click', () => {
-      this.animating = !this.animating;
-      playBtn.textContent = this.animating ? '⏸' : '▶';
-      playBtn.classList.toggle('active', this.animating);
-      if (this.animating) this._startLoop();
-    });
+        draw(animating) {
+          const { canvas, ctx } = this;
+          const W = canvas.width,
+            H = canvas.height;
+          if (this.cycling) {
+            this._drawCycle(W, H);
+            if (animating) {
+              this.cycleTimer++;
+              if (this.cycleTimer >= this.cycleDur) {
+                this.cycleTimer = 0;
+                this.cycleIndex =
+                  (this.cycleIndex + 1) % this.cycleColors.length;
+              }
+            }
+            return;
+          }
+          this._drawBars(W, H, animating);
+          this._drawGray(W, H);
+          this._drawStrip(W, H);
+          this._drawOverlays(W, H);
+          if (animating) this.t = (this.t + 1) % this.loopFrames;
+        }
 
-    document.getElementById('fullscreen-btn').addEventListener('click', () => {
-      if (!document.fullscreenElement) this.area.requestFullscreen?.();
-      else document.exitFullscreen?.();
-    });
+        _drawBars(W, H, animating) {
+          const colors = [
+            [255, 255, 255],
+            [255, 255, 0],
+            [0, 255, 255],
+            [0, 255, 0],
+            [255, 0, 255],
+            [255, 0, 0],
+            [0, 0, 255],
+          ];
+          const barH = Math.floor(H * 0.6),
+            barW = W / colors.length;
+          const breath =
+            animating && this.breathing
+              ? 1 + 0.05 * Math.sin(this.t * ((2 * Math.PI) / 120))
+              : 1;
+          colors.forEach(([r, g, b], i) => {
+            this.ctx.fillStyle = `rgb(${Math.min(255, Math.round(r * breath))},${Math.min(255, Math.round(g * breath))},${Math.min(255, Math.round(b * breath))})`;
+            this.ctx.fillRect(Math.floor(i * barW), 0, Math.ceil(barW), barH);
+          });
+        }
+        _drawGray(W, H) {
+          const topY = Math.floor(H * 0.6),
+            rampH = Math.floor(H * 0.15);
+          for (let i = 0; i < 8; i++) {
+            const v = Math.round((i / 7) * 255);
+            this.ctx.fillStyle = `rgb(${v},${v},${v})`;
+            this.ctx.fillRect(
+              Math.floor((i * W) / 8),
+              topY,
+              Math.ceil(W / 8),
+              rampH,
+            );
+          }
+        }
+        _drawStrip(W, H) {
+          const topY = Math.floor(H * 0.75),
+            h = H - topY,
+            t = Math.floor(W / 3);
+          this.ctx.fillStyle = "#000";
+          this.ctx.fillRect(0, topY, t, h);
+          this.ctx.fillStyle = "#f00";
+          this.ctx.fillRect(t, topY, t, h);
+          this.ctx.fillStyle = "#fff";
+          this.ctx.fillRect(t * 2, topY, W - t * 2, h);
+        }
+        _drawOverlays(W, H) {
+          const ctx = this.ctx;
+          ctx.strokeStyle = "rgba(255,255,255,.1)";
+          ctx.lineWidth = 1;
+          for (let x = 0; x <= W; x += 10) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, H);
+            ctx.stroke();
+          }
+          for (let y = 0; y <= H; y += 10) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y);
+            ctx.stroke();
+          }
+          ctx.strokeStyle = "rgba(255,255,255,.7)";
+          const cx = Math.floor(W / 2) + 0.5,
+            cy = Math.floor(H / 2) + 0.5,
+            arm = Math.min(W, H) * 0.05;
+          ctx.beginPath();
+          ctx.moveTo(cx - arm, cy);
+          ctx.lineTo(cx + arm, cy);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - arm);
+          ctx.lineTo(cx, cy + arm);
+          ctx.stroke();
+          ctx.fillStyle = "rgba(255,255,255,.8)";
+          ctx.fillRect(cx - 1, cy - 1, 2, 2);
+          const m = 20,
+            th = 2;
+          ctx.fillStyle = "rgba(255,255,255,.85)";
+          [
+            [0, 0, 1, 1],
+            [W, 0, -1, 1],
+            [0, H, 1, -1],
+            [W, H, -1, -1],
+          ].forEach(([x, y, sx, sy]) => {
+            ctx.fillRect(x, y, sx * m, sy * th);
+            ctx.fillRect(x, y, sx * th, sy * m);
+          });
+          const cfg = app.config;
+          if (cfg) {
+            ctx.fillStyle = "rgba(0,0,0,.5)";
+            ctx.fillRect(6, 6, 200, 38);
+            ctx.fillStyle = "rgba(255,255,255,.9)";
+            ctx.font = `${Math.max(9, Math.min(14, W / 80))}px monospace`;
+            ctx.fillText(`${cfg.pixelsWide} × ${cfg.pixelsTall} px`, 12, 22);
+            ctx.fillText(
+              `${cfg.pitchLabel}  ${cfg.widthM}m × ${cfg.heightM}m`,
+              12,
+              38,
+            );
+          }
+        }
+        _drawCycle(W, H) {
+          const color = this.cycleColors[this.cycleIndex];
+          this.ctx.fillStyle = color;
+          this.ctx.fillRect(0, 0, W, H);
+          this.ctx.fillStyle =
+            color === "#000000" ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.5)";
+          this.ctx.font = `bold ${Math.max(16, Math.min(48, W / 20))}px monospace`;
+          this.ctx.textAlign = "center";
+          this.ctx.textBaseline = "middle";
+          this.ctx.fillText(
+            ["RED", "GREEN", "BLUE", "WHITE", "BLACK"][this.cycleIndex],
+            W / 2,
+            H / 2,
+          );
+          this.ctx.textAlign = "left";
+          this.ctx.textBaseline = "alphabetic";
+        }
+      }
 
-    // Open config panel on first load
-    configPanel.classList.add('open');
-  },
+      // ── ScrollingTextAnim ─────────────────────────────────────────────────────────
+      class ScrollingTextAnim {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.text = "LED SCREEN";
+          this.color = "#ffffff";
+          this.bgColor = "#000000";
+          this.sizePct = 50;
+          this.t = 0;
+          this.loopFrames = 300;
+        }
+        setLoopDuration(sec) {
+          this.loopFrames = Math.max(1, Math.round(sec * 60));
+          this.t %= this.loopFrames;
+        }
+        seekToTime(sec) {
+          this.t = Math.round(sec * 60) % this.loopFrames;
+        }
 
-  // ─── Config Panel ───
-  _bindConfigPanel() {
-    // Color Test
-    document.getElementById('cfg-breath-on').addEventListener('click', () => {
-      this.content.colorTest.breathing = true;
-      document.getElementById('cfg-breath-on').classList.add('active');
-      document.getElementById('cfg-breath-off').classList.remove('active');
-    });
-    document.getElementById('cfg-breath-off').addEventListener('click', () => {
-      this.content.colorTest.breathing = false;
-      document.getElementById('cfg-breath-off').classList.add('active');
-      document.getElementById('cfg-breath-on').classList.remove('active');
-    });
-    document.getElementById('cfg-cycle-btn').addEventListener('click', () => {
-      this.content.toggleCycle(); this._render();
-    });
+        draw(animating) {
+          const { canvas, ctx } = this;
+          const W = canvas.width,
+            H = canvas.height;
+          ctx.fillStyle = this.bgColor;
+          ctx.fillRect(0, 0, W, H);
+          const fontSize = Math.max(12, Math.round((H * this.sizePct) / 100));
+          ctx.font = `bold ${fontSize}px monospace`;
+          const tw = ctx.measureText(this.text).width;
+          const totalTravel = W + tw;
+          const x = W - (this.t / this.loopFrames) * totalTravel;
+          ctx.fillStyle = this.color;
+          ctx.textBaseline = "middle";
+          ctx.fillText(this.text, x, H / 2);
+          ctx.textBaseline = "alphabetic";
+          if (animating) this.t = (this.t + 1) % this.loopFrames;
+        }
+      }
 
-    // Scroll Text
-    const scrollText  = document.getElementById('scroll-text');
-    const scrollColor = document.getElementById('scroll-color');
-    const scrollBg    = document.getElementById('scroll-bg');
-    const scrollSize  = document.getElementById('scroll-size');
-    const syncScroll  = () => {
-      this.content.scroll.text     = scrollText.value;
-      this.content.scroll.color    = scrollColor.value;
-      this.content.scroll.bgColor  = scrollBg.value;
-      this.content.scroll.sizePct  = parseInt(scrollSize.value, 10);
-      this._render();
-    };
-    [scrollText, scrollColor, scrollBg, scrollSize].forEach(el => el.addEventListener('input', syncScroll));
+      // ── ColorSequenceAnim ─────────────────────────────────────────────────────────
+      class ColorSequenceAnim {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.sequence = [
+            { color: "#ff0000", duration: 1 },
+            { color: "#00ff00", duration: 1 },
+            { color: "#0000ff", duration: 1 },
+            { color: "#ffffff", duration: 1 },
+          ];
+          this.fade = true;
+          this.t = 0;
+          this.loopFrames = 300;
+        }
+        setLoopDuration(sec) {
+          this.loopFrames = Math.max(1, Math.round(sec * 60));
+          this.t %= this.loopFrames;
+        }
+        seekToTime(sec) {
+          this.t = Math.round(sec * 60) % this.loopFrames;
+        }
 
-    // Color Sequence
-    this._bindSequenceEditor();
+        _color() {
+          const seq = this.sequence;
+          if (!seq.length) return "#000";
+          const totalDur = seq.reduce((s, e) => s + e.duration, 0);
+          if (totalDur === 0) return seq[0].color;
+          const timeSec = (this.t / this.loopFrames) * totalDur;
+          let elapsed = 0;
+          for (let i = 0; i < seq.length; i++) {
+            const e = seq[i];
+            if (timeSec < elapsed + e.duration) {
+              if (!this.fade) return e.color;
+              const localT = (timeSec - elapsed) / e.duration;
+              if (localT > 0.8) {
+                const next = seq[(i + 1) % seq.length].color;
+                return lerpColor(e.color, next, (localT - 0.8) / 0.2);
+              }
+              return e.color;
+            }
+            elapsed += e.duration;
+          }
+          return seq[seq.length - 1].color;
+        }
 
-    // Patterns
-    document.querySelectorAll('[data-pattern]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-pattern]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.content.patterns.pattern = btn.dataset.pattern;
-        this._render();
-      });
-    });
-    document.getElementById('pat-color1').addEventListener('input', e => { this.content.patterns.color1 = e.target.value; this._render(); });
-    document.getElementById('pat-color2').addEventListener('input', e => { this.content.patterns.color2 = e.target.value; this._render(); });
+        draw(animating) {
+          this.ctx.fillStyle = this._color();
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+          if (animating) this.t = (this.t + 1) % this.loopFrames;
+        }
+      }
 
-    // Image Sequence
-    this._bindImageUpload();
-    document.getElementById('img-frame-dur').addEventListener('input', e => {
-      const dur = parseFloat(e.target.value) || 1;
-      this.content.images.frameDur = dur;
-      this.content.images.frames.forEach(f => f.duration = dur);
-      this._render();
-    });
-  },
+      // ── MovingPatternsAnim ────────────────────────────────────────────────────────
+      class MovingPatternsAnim {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.pattern = "pulse";
+          this.color1 = "#ff0000";
+          this.color2 = "#000000";
+          this.t = 0;
+          this.loopFrames = 300;
+          this._sparks = [];
+        }
+        setLoopDuration(sec) {
+          this.loopFrames = Math.max(1, Math.round(sec * 60));
+          this.t %= this.loopFrames;
+        }
+        seekToTime(sec) {
+          this.t = Math.round(sec * 60) % this.loopFrames;
+        }
 
-  _bindSequenceEditor() {
-    const renderSeqList = () => {
-      const list = document.getElementById('seq-list');
-      list.innerHTML = '';
-      this.content.sequence.sequence.forEach((entry, i) => {
-        const div = document.createElement('div');
-        div.className = 'seq-entry';
+        draw(animating) {
+          const { canvas, ctx, t, loopFrames } = this;
+          const W = canvas.width,
+            H = canvas.height;
+          const phase = t / loopFrames; // 0–1
 
-        const swatch = document.createElement('input');
-        swatch.type = 'color'; swatch.value = entry.color;
-        swatch.className = 'seq-swatch';
-        swatch.addEventListener('input', e => { entry.color = e.target.value; this._render(); });
+          ctx.fillStyle = this.color2;
+          ctx.fillRect(0, 0, W, H);
 
-        const dur = document.createElement('input');
-        dur.type = 'number'; dur.value = entry.duration; dur.min = '0.1'; dur.step = '0.1';
-        dur.className = 'seq-dur cfg-input';
-        dur.addEventListener('input', e => { entry.duration = parseFloat(e.target.value)||0.5; this._render(); });
+          switch (this.pattern) {
+            case "pulse":
+              this._pulse(W, H, phase);
+              break;
+            case "wave":
+              this._wave(W, H, phase);
+              break;
+            case "sweep":
+              this._sweep(W, H, phase);
+              break;
+            case "checker":
+              this._checker(W, H, phase);
+              break;
+            case "sparkle":
+              this._sparkle(W, H, phase, animating);
+              break;
+          }
+          if (animating) this.t = (this.t + 1) % this.loopFrames;
+        }
 
-        const del = document.createElement('span');
-        del.className = 'seq-del'; del.textContent = '✕';
-        del.addEventListener('click', () => { this.content.sequence.sequence.splice(i,1); renderSeqList(); this._render(); });
+        _pulse(W, H, phase) {
+          const brightness = (Math.sin(phase * 2 * Math.PI) + 1) / 2;
+          const [r, g, b] = hexToRgb(this.color1);
+          this.ctx.fillStyle = `rgb(${Math.round(r * brightness)},${Math.round(g * brightness)},${Math.round(b * brightness)})`;
+          this.ctx.fillRect(0, 0, W, H);
+        }
+        _wave(W, H, phase) {
+          const ctx = this.ctx;
+          const bands = 6;
+          for (let i = 0; i < W; i++) {
+            const wavePhase = (i / W + phase) % 1;
+            const brightness =
+              (Math.sin(wavePhase * 2 * Math.PI * bands) + 1) / 2;
+            const [r, g, b] = hexToRgb(this.color1);
+            ctx.fillStyle = `rgb(${Math.round(r * brightness)},${Math.round(g * brightness)},${Math.round(b * brightness)})`;
+            ctx.fillRect(i, 0, 1, H);
+          }
+        }
+        _sweep(W, H, phase) {
+          const x = Math.round(phase * W);
+          const grad = this.ctx.createLinearGradient(0, 0, W, 0);
+          const [r, g, b] = hexToRgb(this.color1);
+          grad.addColorStop(Math.max(0, (x - 20) / W), this.color2);
+          grad.addColorStop(Math.min(1, x / W), this.color1);
+          grad.addColorStop(Math.min(1, (x + 20) / W), this.color2);
+          this.ctx.fillStyle = grad;
+          this.ctx.fillRect(0, 0, W, H);
+        }
+        _checker(W, H, phase) {
+          const ctx = this.ctx;
+          const size = Math.max(4, Math.round(Math.min(W, H) / 16));
+          const offset = Math.round(phase * size * 2);
+          for (let y = 0; y < H; y += size) {
+            for (let x = 0; x < W; x += size) {
+              const col =
+                Math.floor((x + offset) / size) + Math.floor(y / size);
+              ctx.fillStyle = col % 2 === 0 ? this.color1 : this.color2;
+              ctx.fillRect(x, y, size, size);
+            }
+          }
+        }
+        _sparkle(W, H, phase, animating) {
+          const ctx = this.ctx;
+          const [r, g, b] = hexToRgb(this.color1);
+          if (animating && Math.random() < 0.4) {
+            this._sparks.push({
+              x: Math.random() * W,
+              y: Math.random() * H,
+              life: 1,
+            });
+          }
+          this._sparks = this._sparks.filter((s) => s.life > 0);
+          this._sparks.forEach((s) => {
+            ctx.fillStyle = `rgba(${r},${g},${b},${s.life})`;
+            const sz = Math.max(1, Math.round(s.life * 4));
+            ctx.fillRect(s.x - sz / 2, s.y - sz / 2, sz, sz);
+            s.life -= 0.04;
+          });
+        }
+      }
 
-        div.append(swatch, dur, del);
-        list.appendChild(div);
-      });
-    };
+      // ── ImageSequenceAnim ─────────────────────────────────────────────────────────
+      class ImageSequenceAnim {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.frames = []; // [{ img, duration }]
+          this.frameDur = 1; // seconds per frame default
+          this.t = 0;
+          this.loopFrames = 300;
+        }
+        setLoopDuration(sec) {
+          this.loopFrames = Math.max(1, Math.round(sec * 60));
+          this.t %= this.loopFrames;
+        }
+        seekToTime(sec) {
+          this.t = Math.round(sec * 60) % this.loopFrames;
+        }
 
-    document.getElementById('seq-add').addEventListener('click', () => {
-      const colors = ['#ff0000','#00ff00','#0000ff','#ffffff','#ffff00','#ff00ff','#00ffff'];
-      const n = this.content.sequence.sequence.length;
-      this.content.sequence.sequence.push({ color: colors[n % colors.length], duration: 1 });
-      renderSeqList(); this._render();
-    });
-    document.getElementById('seq-fade-on').addEventListener('click', () => {
-      this.content.sequence.fade = true;
-      document.getElementById('seq-fade-on').classList.add('active');
-      document.getElementById('seq-fade-off').classList.remove('active');
-    });
-    document.getElementById('seq-fade-off').addEventListener('click', () => {
-      this.content.sequence.fade = false;
-      document.getElementById('seq-fade-off').classList.add('active');
-      document.getElementById('seq-fade-on').classList.remove('active');
-    });
+        draw(animating) {
+          const { canvas, ctx } = this;
+          const W = canvas.width,
+            H = canvas.height;
+          ctx.fillStyle = "#000";
+          ctx.fillRect(0, 0, W, H);
 
-    renderSeqList();
-  },
+          if (!this.frames.length) {
+            ctx.fillStyle = "rgba(255,255,255,.3)";
+            ctx.font = `${Math.max(10, W / 30)}px monospace`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("Upload images to start", W / 2, H / 2);
+            ctx.textAlign = "left";
+            ctx.textBaseline = "alphabetic";
+            return;
+          }
 
-  _bindImageUpload() {
-    const upload    = document.getElementById('img-upload');
-    const frameList = document.getElementById('img-frame-list');
+          const totalDur = this.frames.reduce((s, f) => s + f.duration, 0);
+          const timeSec = (this.t / this.loopFrames) * totalDur;
+          let elapsed = 0,
+            frame = this.frames[this.frames.length - 1];
+          for (const f of this.frames) {
+            if (timeSec < elapsed + f.duration) {
+              frame = f;
+              break;
+            }
+            elapsed += f.duration;
+          }
 
-    const renderFrameList = () => {
-      frameList.innerHTML = '';
-      this.content.images.frames.forEach((f, i) => {
-        const div = document.createElement('div');
-        div.className = 'img-thumb';
-        const img = document.createElement('img');
-        img.src = f.img.src;
-        const del = document.createElement('span');
-        del.className = 'img-del'; del.textContent = '✕';
-        del.addEventListener('click', e => { e.stopPropagation(); this.content.images.frames.splice(i,1); renderFrameList(); this._render(); });
-        div.append(img, del);
-        frameList.appendChild(div);
-      });
-    };
+          // Draw image fitted to canvas
+          const img = frame.img;
+          const scale = Math.min(W / img.naturalWidth, H / img.naturalHeight);
+          const dw = img.naturalWidth * scale,
+            dh = img.naturalHeight * scale;
+          ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
 
-    upload.addEventListener('change', () => {
-      const dur = parseFloat(document.getElementById('img-frame-dur').value) || 1;
-      Array.from(upload.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const img = new Image();
-          img.onload = () => {
-            this.content.images.frames.push({ img, duration: dur });
-            renderFrameList(); this._render();
+          if (animating) this.t = (this.t + 1) % this.loopFrames;
+        }
+      }
+
+      // ── ContentManager ────────────────────────────────────────────────────────────
+      class ContentManager {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.mode = "colortest";
+          this.colorTest = new ColorTestPattern(canvas);
+          this.scroll = new ScrollingTextAnim(canvas);
+          this.sequence = new ColorSequenceAnim(canvas);
+          this.patterns = new MovingPatternsAnim(canvas);
+          this.images = new ImageSequenceAnim(canvas);
+        }
+
+        _active() {
+          return {
+            colortest: this.colorTest,
+            scroll: this.scroll,
+            sequence: this.sequence,
+            patterns: this.patterns,
+            images: this.images,
+          }[this.mode];
+        }
+
+        setMode(mode) {
+          this.mode = mode;
+        }
+        setLoopDuration(sec) {
+          Object.values(this)
+            .filter((v) => v && typeof v.setLoopDuration === "function")
+            .forEach((v) => v.setLoopDuration(sec));
+        }
+        seekToTime(sec) {
+          this._active().seekToTime(sec);
+        }
+        toggleCycle() {
+          this.colorTest.toggleCycle();
+        }
+        draw(animating) {
+          this._active().draw(animating);
+        }
+      }
+
+      // ── App ───────────────────────────────────────────────────────────────────────
+      const app = {
+        config: null,
+        content: null,
+        scaler: null,
+        animating: true,
+        raf: null,
+        recording: false,
+        recordingBitrateMbps: 10,
+        fpsCounter: 0,
+        currentFps: 0,
+        fpsLastTime: 0,
+
+        init() {
+          this.canvas = document.getElementById("led-canvas");
+          this.area = document.getElementById("canvas-area");
+          this.wrapper = document.getElementById("canvas-wrapper");
+          this.content = new ContentManager(this.canvas);
+          this.scaler = new ScaleManager(this.area, this.wrapper, this.canvas);
+          this._bindModal();
+          this._bindToolbar();
+          this._bindConfigPanel();
+          this._bindKeys();
+          this._bindExport();
+          window.addEventListener("resize", () => this.scaler.update());
+          this._updateModalPreview();
+        },
+
+        // ─── Modal ───
+        _getPitch() {
+          const pEl = document.getElementById("inp-pitch");
+          if (pEl.value === "custom")
+            return parseFloat(
+              document.getElementById("inp-pitch-custom").value,
+            );
+          return parseFloat(pEl.value);
+        },
+
+        _bindModal() {
+          const wEl = document.getElementById("inp-width");
+          const hEl = document.getElementById("inp-height");
+          const pEl = document.getElementById("inp-pitch");
+          const pCustomEl = document.getElementById("inp-pitch-custom");
+
+          const onPitchChange = () => {
+            const isCustom = pEl.value === "custom";
+            pCustomEl.style.display = isCustom ? "block" : "none";
+            if (isCustom) pCustomEl.focus();
+            this._updateModalPreview();
           };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-      upload.value = '';
-    });
-  },
 
-  // ─── Keys ───
-  _bindKeys() {
-    window.addEventListener('keyup', e => {
-      if (e.target.tagName === 'BUTTON' && (e.code === 'Space' || e.key === ' ')) e.preventDefault();
-    });
-    window.addEventListener('keydown', e => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-      if (e.code === 'Space' || e.key === ' ') {
-        e.preventDefault();
-        this.content.toggleCycle(); this._render();
-        if (this.animating) this._startLoop();
-      }
-    });
-  },
+          pEl.addEventListener("change", onPitchChange);
+          [wEl, hEl, pCustomEl].forEach((el) =>
+            el.addEventListener("input", () => this._updateModalPreview()),
+          );
 
-  // ─── Export ───
-  _bindExport() {
-    let loopDur = 5, inPct = 0, outPct = 1;
-    let recorder = null, progressTimer = null;
+          document
+            .getElementById("btn-create")
+            .addEventListener("click", () => {
+              const w = parseFloat(wEl.value),
+                h = parseFloat(hEl.value),
+                p = this._getPitch();
+              if (!w || !h || !p || w <= 0 || h <= 0 || p <= 0) return;
+              this.config = new ScreenConfig(w, h, p);
+              this._applyConfig();
+              document.getElementById("modal-overlay").classList.add("hidden");
+            });
 
-    const overlay    = document.getElementById('export-overlay');
-    const recordBtn  = document.getElementById('ep-record-btn');
-    const cancelBtn  = document.getElementById('ep-cancel-btn');
-    const progressWrap = document.getElementById('ep-progress-wrap');
-    const progressBar  = document.getElementById('ep-progress-bar');
-    const statusEl     = document.getElementById('ep-status');
-    const track        = document.getElementById('ep-track');
-    const fill         = document.getElementById('ep-fill');
-    const handleIn     = document.getElementById('ep-handle-in');
-    const handleOut    = document.getElementById('ep-handle-out');
+          const knownPitches = [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 16, 20];
+          document.getElementById("btn-edit").addEventListener("click", () => {
+            if (this.config) {
+              wEl.value = this.config.widthM;
+              hEl.value = this.config.heightM;
+              if (knownPitches.includes(this.config.pitchMm)) {
+                pEl.value = this.config.pitchMm;
+                pCustomEl.style.display = "none";
+              } else {
+                pEl.value = "custom";
+                pCustomEl.value = this.config.pitchMm;
+                pCustomEl.style.display = "block";
+              }
+              this._updateModalPreview();
+            }
+            document.getElementById("modal-overlay").classList.remove("hidden");
+          });
+        },
 
-    const updateTimeline = () => {
-      fill.style.left  = (inPct * 100) + '%';
-      fill.style.width = ((outPct - inPct) * 100) + '%';
-      handleIn.style.left  = (inPct  * 100) + '%';
-      handleOut.style.left = (outPct * 100) + '%';
-      const inT = inPct * loopDur, outT = outPct * loopDur, durT = outT - inT;
-      document.getElementById('ep-in-label').textContent  = `In: ${inT.toFixed(2)}s`;
-      document.getElementById('ep-out-label').textContent = `Out: ${outT.toFixed(2)}s`;
-      document.getElementById('ep-dur-label').textContent = `${durT.toFixed(2)}s`;
-      recordBtn.textContent = `⏺ Record ${durT.toFixed(2)}s`;
-    };
+        _updateModalPreview() {
+          const w = parseFloat(document.getElementById("inp-width").value);
+          const h = parseFloat(document.getElementById("inp-height").value);
+          const p = this._getPitch();
+          const resEl = document.getElementById("modal-resolution");
+          const warnEl = document.getElementById("modal-warning");
+          const pxEl = document.getElementById("modal-pixels");
+          if (!w || !h || !p || w <= 0 || h <= 0) {
+            resEl.textContent = "Resolution: — × — px";
+            warnEl.textContent = "";
+            pxEl.textContent = "";
+            return;
+          }
+          const pw = Math.round((w * 1000) / p),
+            ph = Math.round((h * 1000) / p);
+          resEl.textContent = `Resolution: ${pw} × ${ph} px`;
+          pxEl.textContent = `Total: ${(pw * ph).toLocaleString()} pixels`;
+          warnEl.textContent =
+            pw > 5000 || ph > 5000
+              ? "⚠ Very high resolution — may be slow"
+              : pw < 10 || ph < 10
+                ? "⚠ Resolution very low"
+                : "";
+        },
 
-    const makeDraggable = (handle, isIn) => {
-      handle.addEventListener('mousedown', e => {
-        e.preventDefault(); handle.classList.add('dragging');
-        const rect = track.getBoundingClientRect();
-        const onMove = e => {
-          const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          if (isIn) inPct = Math.min(pct, outPct - 0.02);
-          else      outPct = Math.max(pct, inPct  + 0.02);
+        _applyConfig() {
+          const cfg = this.config;
+          this.canvas.width = cfg.pixelsWide;
+          this.canvas.height = cfg.pixelsTall;
+          document.getElementById("bar-pitch").textContent = cfg.pitchLabel;
+          document.getElementById("bar-size").textContent =
+            `${cfg.widthM}m × ${cfg.heightM}m`;
+          document.getElementById("bar-res").textContent =
+            `${cfg.pixelsWide} × ${cfg.pixelsTall} px`;
+          this.scaler.update();
+          this._startLoop();
+        },
+
+        // ─── Toolbar ───
+        _bindToolbar() {
+          const configPanel = document.getElementById("config-panel");
+          document.querySelectorAll("[data-mode]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              document
+                .querySelectorAll("[data-mode]")
+                .forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              this.content.setMode(btn.dataset.mode);
+              // Show config section
+              document
+                .querySelectorAll(".cfg-section")
+                .forEach((s) => s.classList.remove("active"));
+              const sec = document.getElementById("cfg-" + btn.dataset.mode);
+              if (sec) {
+                sec.classList.add("active");
+                configPanel.classList.add("open");
+              }
+              this._render();
+            });
+          });
+
+          const playBtn = document.getElementById("play-btn");
+          playBtn.addEventListener("click", () => {
+            this.animating = !this.animating;
+            playBtn.textContent = this.animating ? "⏸" : "▶";
+            playBtn.classList.toggle("active", this.animating);
+            if (this.animating) this._startLoop();
+          });
+
+          document
+            .getElementById("fullscreen-btn")
+            .addEventListener("click", () => {
+              if (!document.fullscreenElement) this.area.requestFullscreen?.();
+              else document.exitFullscreen?.();
+            });
+
+          // Open config panel on first load
+          configPanel.classList.add("open");
+        },
+
+        // ─── Config Panel ───
+        _bindConfigPanel() {
+          // Color Test
+          document
+            .getElementById("cfg-breath-on")
+            .addEventListener("click", () => {
+              this.content.colorTest.breathing = true;
+              document.getElementById("cfg-breath-on").classList.add("active");
+              document
+                .getElementById("cfg-breath-off")
+                .classList.remove("active");
+            });
+          document
+            .getElementById("cfg-breath-off")
+            .addEventListener("click", () => {
+              this.content.colorTest.breathing = false;
+              document.getElementById("cfg-breath-off").classList.add("active");
+              document
+                .getElementById("cfg-breath-on")
+                .classList.remove("active");
+            });
+          document
+            .getElementById("cfg-cycle-btn")
+            .addEventListener("click", () => {
+              this.content.toggleCycle();
+              this._render();
+            });
+
+          // Scroll Text
+          const scrollText = document.getElementById("scroll-text");
+          const scrollColor = document.getElementById("scroll-color");
+          const scrollBg = document.getElementById("scroll-bg");
+          const scrollSize = document.getElementById("scroll-size");
+          const syncScroll = () => {
+            this.content.scroll.text = scrollText.value;
+            this.content.scroll.color = scrollColor.value;
+            this.content.scroll.bgColor = scrollBg.value;
+            this.content.scroll.sizePct = parseInt(scrollSize.value, 10);
+            this._render();
+          };
+          [scrollText, scrollColor, scrollBg, scrollSize].forEach((el) =>
+            el.addEventListener("input", syncScroll),
+          );
+
+          // Color Sequence
+          this._bindSequenceEditor();
+
+          // Patterns
+          document.querySelectorAll("[data-pattern]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              document
+                .querySelectorAll("[data-pattern]")
+                .forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              this.content.patterns.pattern = btn.dataset.pattern;
+              this._render();
+            });
+          });
+          document
+            .getElementById("pat-color1")
+            .addEventListener("input", (e) => {
+              this.content.patterns.color1 = e.target.value;
+              this._render();
+            });
+          document
+            .getElementById("pat-color2")
+            .addEventListener("input", (e) => {
+              this.content.patterns.color2 = e.target.value;
+              this._render();
+            });
+
+          // Image Sequence
+          this._bindImageUpload();
+          document
+            .getElementById("img-frame-dur")
+            .addEventListener("input", (e) => {
+              const dur = parseFloat(e.target.value) || 1;
+              this.content.images.frameDur = dur;
+              this.content.images.frames.forEach((f) => (f.duration = dur));
+              this._render();
+            });
+        },
+
+        _bindSequenceEditor() {
+          const renderSeqList = () => {
+            const list = document.getElementById("seq-list");
+            list.innerHTML = "";
+            this.content.sequence.sequence.forEach((entry, i) => {
+              const div = document.createElement("div");
+              div.className = "seq-entry";
+
+              const swatch = document.createElement("input");
+              swatch.type = "color";
+              swatch.value = entry.color;
+              swatch.className = "seq-swatch";
+              swatch.addEventListener("input", (e) => {
+                entry.color = e.target.value;
+                this._render();
+              });
+
+              const dur = document.createElement("input");
+              dur.type = "number";
+              dur.value = entry.duration;
+              dur.min = "0.1";
+              dur.step = "0.1";
+              dur.className = "seq-dur cfg-input";
+              dur.addEventListener("input", (e) => {
+                entry.duration = parseFloat(e.target.value) || 0.5;
+                this._render();
+              });
+
+              const del = document.createElement("span");
+              del.className = "seq-del";
+              del.textContent = "✕";
+              del.addEventListener("click", () => {
+                this.content.sequence.sequence.splice(i, 1);
+                renderSeqList();
+                this._render();
+              });
+
+              div.append(swatch, dur, del);
+              list.appendChild(div);
+            });
+          };
+
+          document.getElementById("seq-add").addEventListener("click", () => {
+            const colors = [
+              "#ff0000",
+              "#00ff00",
+              "#0000ff",
+              "#ffffff",
+              "#ffff00",
+              "#ff00ff",
+              "#00ffff",
+            ];
+            const n = this.content.sequence.sequence.length;
+            this.content.sequence.sequence.push({
+              color: colors[n % colors.length],
+              duration: 1,
+            });
+            renderSeqList();
+            this._render();
+          });
+          document
+            .getElementById("seq-fade-on")
+            .addEventListener("click", () => {
+              this.content.sequence.fade = true;
+              document.getElementById("seq-fade-on").classList.add("active");
+              document
+                .getElementById("seq-fade-off")
+                .classList.remove("active");
+            });
+          document
+            .getElementById("seq-fade-off")
+            .addEventListener("click", () => {
+              this.content.sequence.fade = false;
+              document.getElementById("seq-fade-off").classList.add("active");
+              document.getElementById("seq-fade-on").classList.remove("active");
+            });
+
+          renderSeqList();
+        },
+
+        _bindImageUpload() {
+          const upload = document.getElementById("img-upload");
+          const frameList = document.getElementById("img-frame-list");
+
+          const renderFrameList = () => {
+            frameList.innerHTML = "";
+            this.content.images.frames.forEach((f, i) => {
+              const div = document.createElement("div");
+              div.className = "img-thumb";
+              const img = document.createElement("img");
+              img.src = f.img.src;
+              const del = document.createElement("span");
+              del.className = "img-del";
+              del.textContent = "✕";
+              del.addEventListener("click", (e) => {
+                e.stopPropagation();
+                this.content.images.frames.splice(i, 1);
+                renderFrameList();
+                this._render();
+              });
+              div.append(img, del);
+              frameList.appendChild(div);
+            });
+          };
+
+          upload.addEventListener("change", () => {
+            const dur =
+              parseFloat(document.getElementById("img-frame-dur").value) || 1;
+            Array.from(upload.files).forEach((file) => {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                  this.content.images.frames.push({ img, duration: dur });
+                  renderFrameList();
+                  this._render();
+                };
+                img.src = e.target.result;
+              };
+              reader.readAsDataURL(file);
+            });
+            upload.value = "";
+          });
+        },
+
+        // ─── Keys ───
+        _bindKeys() {
+          window.addEventListener("keyup", (e) => {
+            if (
+              e.target.tagName === "BUTTON" &&
+              (e.code === "Space" || e.key === " ")
+            )
+              e.preventDefault();
+          });
+          window.addEventListener("keydown", (e) => {
+            if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT")
+              return;
+            if (e.code === "Space" || e.key === " ") {
+              e.preventDefault();
+              this.content.toggleCycle();
+              this._render();
+              if (this.animating) this._startLoop();
+            }
+          });
+        },
+
+        // ─── Export ───
+        _bindExport() {
+          let loopDur = 5,
+            inPct = 0,
+            outPct = 1;
+          let recorder = null,
+            progressTimer = null;
+
+          const overlay = document.getElementById("export-overlay");
+          const recordBtn = document.getElementById("ep-record-btn");
+          const cancelBtn = document.getElementById("ep-cancel-btn");
+          const progressWrap = document.getElementById("ep-progress-wrap");
+          const progressBar = document.getElementById("ep-progress-bar");
+          const statusEl = document.getElementById("ep-status");
+          const track = document.getElementById("ep-track");
+          const fill = document.getElementById("ep-fill");
+          const handleIn = document.getElementById("ep-handle-in");
+          const handleOut = document.getElementById("ep-handle-out");
+
+          const updateTimeline = () => {
+            fill.style.left = inPct * 100 + "%";
+            fill.style.width = (outPct - inPct) * 100 + "%";
+            handleIn.style.left = inPct * 100 + "%";
+            handleOut.style.left = outPct * 100 + "%";
+            const inT = inPct * loopDur,
+              outT = outPct * loopDur,
+              durT = outT - inT;
+            document.getElementById("ep-in-label").textContent =
+              `In: ${inT.toFixed(2)}s`;
+            document.getElementById("ep-out-label").textContent =
+              `Out: ${outT.toFixed(2)}s`;
+            document.getElementById("ep-dur-label").textContent =
+              `${durT.toFixed(2)}s`;
+            recordBtn.textContent = `⏺ Record ${durT.toFixed(2)}s`;
+          };
+
+          const makeDraggable = (handle, isIn) => {
+            handle.addEventListener("mousedown", (e) => {
+              e.preventDefault();
+              handle.classList.add("dragging");
+              const rect = track.getBoundingClientRect();
+              const onMove = (e) => {
+                const pct = Math.max(
+                  0,
+                  Math.min(1, (e.clientX - rect.left) / rect.width),
+                );
+                if (isIn) inPct = Math.min(pct, outPct - 0.02);
+                else outPct = Math.max(pct, inPct + 0.02);
+                updateTimeline();
+              };
+              const onUp = () => {
+                handle.classList.remove("dragging");
+                window.removeEventListener("mousemove", onMove);
+                window.removeEventListener("mouseup", onUp);
+              };
+              window.addEventListener("mousemove", onMove);
+              window.addEventListener("mouseup", onUp);
+            });
+          };
+          makeDraggable(handleIn, true);
+          makeDraggable(handleOut, false);
           updateTimeline();
-        };
-        const onUp = () => { handle.classList.remove('dragging'); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp);
-      });
-    };
-    makeDraggable(handleIn, true);
-    makeDraggable(handleOut, false);
-    updateTimeline();
 
-    document.querySelectorAll('[data-loop]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-loop]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        loopDur = parseFloat(btn.dataset.loop);
-        this.content.setLoopDuration(loopDur);
-        updateTimeline();
-      });
-    });
+          document.querySelectorAll("[data-loop]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              document
+                .querySelectorAll("[data-loop]")
+                .forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              loopDur = parseFloat(btn.dataset.loop);
+              this.content.setLoopDuration(loopDur);
+              updateTimeline();
+            });
+          });
 
-    document.getElementById('export-btn').addEventListener('click', () => {
-      overlay.classList.remove('hidden'); updateTimeline();
-    });
+          document
+            .getElementById("export-btn")
+            .addEventListener("click", () => {
+              overlay.classList.remove("hidden");
+              updateTimeline();
+            });
 
-    const reset = () => {
-      recorder = null; clearInterval(progressTimer);
-      recordBtn.disabled = false; updateTimeline();
-      progressWrap.style.display = 'none'; progressBar.style.width = '0%'; statusEl.textContent = '';
-    };
-    const close = () => {
-      if (recorder && recorder.state !== 'inactive') recorder.stop();
-      reset(); overlay.classList.add('hidden');
-    };
-    cancelBtn.addEventListener('click', close);
-    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+          const reset = () => {
+            recorder = null;
+            clearInterval(progressTimer);
+            recordBtn.disabled = false;
+            updateTimeline();
+            progressWrap.style.display = "none";
+            progressBar.style.width = "0%";
+            statusEl.textContent = "";
+          };
+          const close = () => {
+            if (recorder && recorder.state !== "inactive") recorder.stop();
+            reset();
+            overlay.classList.add("hidden");
+          };
+          cancelBtn.addEventListener("click", close);
+          overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) close();
+          });
 
-    recordBtn.addEventListener('click', () => {
-      if (!this.config) { statusEl.textContent = 'Set up a screen first.'; return; }
-      const inTime = inPct * loopDur, outTime = outPct * loopDur, durMs = (outTime - inTime) * 1000;
-      if (durMs < 200) { statusEl.textContent = 'Range too short.'; return; }
+          recordBtn.addEventListener("click", () => {
+            if (!this.config) {
+              statusEl.textContent = "Set up a screen first.";
+              return;
+            }
+            const inTime = inPct * loopDur,
+              outTime = outPct * loopDur,
+              durMs = (outTime - inTime) * 1000;
+            if (durMs < 200) {
+              statusEl.textContent = "Range too short.";
+              return;
+            }
 
-      const mimeType =
-        MediaRecorder.isTypeSupported('video/mp4;codecs=avc1') ? 'video/mp4;codecs=avc1' :
-        MediaRecorder.isTypeSupported('video/mp4')             ? 'video/mp4' :
-        MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' :
-        'video/webm';
-      const ext = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
-      const chunks = [];
+            const mimeType = MediaRecorder.isTypeSupported(
+              "video/mp4;codecs=avc1",
+            )
+              ? "video/mp4;codecs=avc1"
+              : MediaRecorder.isTypeSupported("video/mp4")
+                ? "video/mp4"
+                : MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+                  ? "video/webm;codecs=vp9"
+                  : "video/webm";
+            const ext = mimeType.startsWith("video/mp4") ? "mp4" : "webm";
+            const chunks = [];
 
-      const bitrate = 10_000_000;
-      this.recordingBitrateMbps = bitrate / 1_000_000;
-      try { recorder = new MediaRecorder(this.canvas.captureStream(30), { mimeType, videoBitsPerSecond: bitrate }); }
-      catch { recorder = new MediaRecorder(this.canvas.captureStream(30)); }
+            const bitrate = 10_000_000;
+            this.recordingBitrateMbps = bitrate / 1_000_000;
+            try {
+              recorder = new MediaRecorder(this.canvas.captureStream(30), {
+                mimeType,
+                videoBitsPerSecond: bitrate,
+              });
+            } catch {
+              recorder = new MediaRecorder(this.canvas.captureStream(30));
+            }
 
-      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mimeType });
-        const url  = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `led-${this.config.pixelsWide}x${this.config.pixelsTall}-${inTime.toFixed(1)}-${outTime.toFixed(1)}s.${ext}`;
-        a.click(); URL.revokeObjectURL(url);
-        statusEl.textContent = `Saved as .${ext}`;
-        setTimeout(() => { reset(); close(); }, 1500);
+            recorder.ondataavailable = (e) => {
+              if (e.data.size > 0) chunks.push(e.data);
+            };
+            recorder.onstop = () => {
+              const blob = new Blob(chunks, { type: mimeType });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `led-${this.config.pixelsWide}x${this.config.pixelsTall}-${inTime.toFixed(1)}-${outTime.toFixed(1)}s.${ext}`;
+              a.click();
+              URL.revokeObjectURL(url);
+              statusEl.textContent = `Saved as .${ext}`;
+              setTimeout(() => {
+                reset();
+                close();
+              }, 1500);
+            };
+
+            this.content.seekToTime(inTime);
+            const wasAnimating = this.animating;
+            this.animating = true;
+            this.recording = true;
+            this._startLoop();
+
+            recorder.start(100);
+            recordBtn.disabled = true;
+            recordBtn.textContent = "Recording…";
+            progressWrap.style.display = "block";
+
+            const startMs = Date.now();
+            progressTimer = setInterval(() => {
+              const elapsed = Date.now() - startMs;
+              progressBar.style.width =
+                Math.min(100, (elapsed / durMs) * 100) + "%";
+              statusEl.textContent = `${((durMs - elapsed) / 1000).toFixed(1)}s remaining…`;
+            }, 100);
+
+            setTimeout(() => {
+              recorder.stop();
+              clearInterval(progressTimer);
+              this.recording = false;
+              progressBar.style.width = "100%";
+              statusEl.textContent = "Encoding…";
+              if (!wasAnimating) this.animating = false;
+            }, durMs);
+          });
+        },
+
+        // ─── Loop ───
+        _startLoop() {
+          if (this.raf) cancelAnimationFrame(this.raf);
+          this.fpsLastTime = performance.now();
+          this.fpsCounter = 0;
+          const loop = () => {
+            this._render();
+            this.fpsCounter++;
+            const now = performance.now();
+            if (now - this.fpsLastTime >= 1000) {
+              this.currentFps = this.fpsCounter;
+              this.fpsCounter = 0;
+              this.fpsLastTime = now;
+            }
+            if (this.animating) this.raf = requestAnimationFrame(loop);
+          };
+          this.raf = requestAnimationFrame(loop);
+        },
+
+        _render() {
+          if (!this.config) return;
+          this.content.draw(this.animating);
+          if (this.recording) this._drawInfoOverlay();
+        },
+
+        _drawInfoOverlay() {
+          const ctx = this.canvas.getContext("2d");
+          const W = this.canvas.width,
+            H = this.canvas.height;
+          const cfg = this.config;
+
+          const lines = [
+            `Pitch      ${cfg.pitchLabel}`,
+            `Screen     ${cfg.widthM}m × ${cfg.heightM}m`,
+            `Resolution ${cfg.pixelsWide} × ${cfg.pixelsTall} px`,
+            `FPS        ${this.currentFps}`,
+            `Bitrate    ${this.recordingBitrateMbps} Mbps`,
+          ];
+
+          const fs = Math.max(10, Math.min(18, W / 55));
+          const lineH = Math.round(fs * 1.7);
+          const padX = 14,
+            padY = 10;
+          const boxW = fs * 18;
+          const boxH = lines.length * lineH + padY * 2;
+          const bx = W - boxW - 12,
+            by = H - boxH - 12;
+
+          // Background
+          ctx.fillStyle = "rgba(0,0,0,0.72)";
+          ctx.beginPath();
+          ctx.roundRect?.(bx, by, boxW, boxH, 4) ??
+            ctx.rect(bx, by, boxW, boxH);
+          ctx.fill();
+
+          // Border accent line
+          ctx.fillStyle = "#00d4ff";
+          ctx.fillRect(bx, by, 3, boxH);
+
+          // Text
+          ctx.font = `${fs}px monospace`;
+          ctx.textBaseline = "top";
+          lines.forEach((line, i) => {
+            const [key, ...rest] = line.split(/\s{2,}/);
+            const val = rest.join("  ");
+            const y = by + padY + i * lineH;
+            ctx.fillStyle = "#6699aa";
+            ctx.fillText(key, bx + padX + 3, y);
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText(val, bx + padX + fs * 6.5, y);
+          });
+          ctx.textBaseline = "alphabetic";
+        },
       };
 
-      this.content.seekToTime(inTime);
-      const wasAnimating = this.animating;
-      this.animating = true;
-      this.recording = true;
-      this._startLoop();
-
-      recorder.start(100);
-      recordBtn.disabled = true; recordBtn.textContent = 'Recording…';
-      progressWrap.style.display = 'block';
-
-      const startMs = Date.now();
-      progressTimer = setInterval(() => {
-        const elapsed = Date.now() - startMs;
-        progressBar.style.width = Math.min(100, elapsed / durMs * 100) + '%';
-        statusEl.textContent = `${((durMs - elapsed) / 1000).toFixed(1)}s remaining…`;
-      }, 100);
-
-      setTimeout(() => {
-        recorder.stop(); clearInterval(progressTimer);
-        this.recording = false;
-        progressBar.style.width = '100%'; statusEl.textContent = 'Encoding…';
-        if (!wasAnimating) this.animating = false;
-      }, durMs);
-    });
-  },
-
-  // ─── Loop ───
-  _startLoop() {
-    if (this.raf) cancelAnimationFrame(this.raf);
-    this.fpsLastTime = performance.now();
-    this.fpsCounter  = 0;
-    const loop = () => {
-      this._render();
-      this.fpsCounter++;
-      const now = performance.now();
-      if (now - this.fpsLastTime >= 1000) {
-        this.currentFps  = this.fpsCounter;
-        this.fpsCounter  = 0;
-        this.fpsLastTime = now;
-      }
-      if (this.animating) this.raf = requestAnimationFrame(loop);
-    };
-    this.raf = requestAnimationFrame(loop);
-  },
-
-  _render() {
-    if (!this.config) return;
-    this.content.draw(this.animating);
-    if (this.recording) this._drawInfoOverlay();
-  },
-
-  _drawInfoOverlay() {
-    const ctx = this.canvas.getContext('2d');
-    const W = this.canvas.width, H = this.canvas.height;
-    const cfg = this.config;
-
-    const lines = [
-      `Pitch      ${cfg.pitchLabel}`,
-      `Screen     ${cfg.widthM}m × ${cfg.heightM}m`,
-      `Resolution ${cfg.pixelsWide} × ${cfg.pixelsTall} px`,
-      `FPS        ${this.currentFps}`,
-      `Bitrate    ${this.recordingBitrateMbps} Mbps`,
-    ];
-
-    const fs    = Math.max(10, Math.min(18, W / 55));
-    const lineH = Math.round(fs * 1.7);
-    const padX  = 14, padY = 10;
-    const boxW  = fs * 18;
-    const boxH  = lines.length * lineH + padY * 2;
-    const bx = W - boxW - 12, by = H - boxH - 12;
-
-    // Background
-    ctx.fillStyle = 'rgba(0,0,0,0.72)';
-    ctx.beginPath();
-    ctx.roundRect?.(bx, by, boxW, boxH, 4) ?? ctx.rect(bx, by, boxW, boxH);
-    ctx.fill();
-
-    // Border accent line
-    ctx.fillStyle = '#00d4ff';
-    ctx.fillRect(bx, by, 3, boxH);
-
-    // Text
-    ctx.font = `${fs}px monospace`;
-    ctx.textBaseline = 'top';
-    lines.forEach((line, i) => {
-      const [key, ...rest] = line.split(/\s{2,}/);
-      const val = rest.join('  ');
-      const y = by + padY + i * lineH;
-      ctx.fillStyle = '#6699aa';
-      ctx.fillText(key, bx + padX + 3, y);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(val, bx + padX + fs * 6.5, y);
-    });
-    ctx.textBaseline = 'alphabetic';
-  }
-};
-
-app.init();
-</script>
-</body>
+      app.init();
+    </script>
+  </body>
 </html>
