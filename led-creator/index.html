@@ -884,6 +884,16 @@
             max="90"
             value="50"
           />
+          <div class="cfg-sep"></div>
+          <span class="cfg-label">Speed</span>
+          <input
+            class="cfg-input"
+            id="scroll-speed"
+            type="range"
+            min="1"
+            max="10"
+            value="3"
+          />
         </div>
 
         <!-- Color Sequence -->
@@ -1259,6 +1269,7 @@
           this.color = "#ffffff";
           this.bgColor = "#000000";
           this.sizePct = 50;
+          this.speed = 3;
           this.t = 0;
           this.loopFrames = 300;
         }
@@ -1285,7 +1296,7 @@
           ctx.textBaseline = "middle";
           ctx.fillText(this.text, x, H / 2);
           ctx.textBaseline = "alphabetic";
-          if (animating) this.t = (this.t + 1) % this.loopFrames;
+          if (animating) this.t = (this.t + this.speed) % this.loopFrames;
         }
       }
 
@@ -1752,15 +1763,17 @@
           const scrollColor = document.getElementById("scroll-color");
           const scrollBg = document.getElementById("scroll-bg");
           const scrollSize = document.getElementById("scroll-size");
+          const scrollSpeed = document.getElementById("scroll-speed");
           const syncScroll = () => {
             this.content.scroll.text = scrollText.value;
             this.content.scroll.color = scrollColor.value;
             this.content.scroll.bgColor = scrollBg.value;
             this.content.scroll.sizePct = parseInt(scrollSize.value, 10);
+            this.content.scroll.speed = parseInt(scrollSpeed.value, 10);
             this._render();
           };
-          [scrollText, scrollColor, scrollBg, scrollSize].forEach((el) =>
-            el.addEventListener("input", syncScroll),
+          [scrollText, scrollColor, scrollBg, scrollSize, scrollSpeed].forEach(
+            (el) => el.addEventListener("input", syncScroll),
           );
 
           // Color Sequence
