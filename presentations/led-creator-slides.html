@@ -1,0 +1,1640 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LED Screen Content Creator — Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ===========================================
+   CSS CUSTOM PROPERTIES
+   Edit these to change the whole look
+   =========================================== */
+      :root {
+        --bg: #0a0a0a;
+        --surface: #141414;
+        --border: #222;
+        --cyan: #00d4ff;
+        --orange: #ff6b35;
+        --text: #e8e8e8;
+        --dim: #555;
+        --mono: "Space Mono", monospace;
+        --sans: "Space Grotesk", sans-serif;
+
+        /* Typography — all clamp() for viewport fitting */
+        --title-size: clamp(2rem, 6vw, 5.5rem);
+        --h2-size: clamp(1.4rem, 3.5vw, 2.8rem);
+        --h3-size: clamp(0.95rem, 2vw, 1.5rem);
+        --body-size: clamp(0.78rem, 1.3vw, 1rem);
+        --small-size: clamp(0.65rem, 1vw, 0.82rem);
+        --mono-size: clamp(0.72rem, 1.1vw, 0.9rem);
+
+        /* Spacing */
+        --pad: clamp(1.5rem, 5vw, 5rem);
+        --gap: clamp(0.5rem, 1.5vw, 1.2rem);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* ===========================================
+   RESET + BASE
+   =========================================== */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+        height: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        height: 100%;
+        overflow-x: hidden;
+      }
+
+      /* ===========================================
+   VIEWPORT FITTING — CRITICAL
+   Every slide = exactly 100vh, never scrolls
+   =========================================== */
+      .slide {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        scroll-snap-align: start;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        padding: var(--pad);
+      }
+
+      /* Grid background on every slide */
+      .slide::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px);
+        background-size: 48px 48px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .slide > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Constrain content width */
+      .slide-inner {
+        max-width: min(92vw, 1020px);
+        width: 100%;
+        max-height: 88vh;
+        overflow: hidden;
+      }
+
+      /* ===========================================
+   FIXED UI — LANGUAGE + DOTS + PROGRESS
+   =========================================== */
+      #lang-toggle {
+        position: fixed;
+        top: 1.2rem;
+        right: 1.5rem;
+        z-index: 1000;
+        display: flex;
+        gap: 3px;
+        background: rgba(14, 14, 14, 0.92);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 4px;
+        backdrop-filter: blur(10px);
+      }
+
+      .lang-btn {
+        background: none;
+        border: none;
+        color: var(--dim);
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        padding: 4px 11px;
+        border-radius: 18px;
+        cursor: pointer;
+        transition: all 0.2s;
+        letter-spacing: 0.05em;
+      }
+      .lang-btn:hover {
+        color: var(--text);
+      }
+      .lang-btn.active {
+        background: var(--cyan);
+        color: #000;
+        font-weight: 700;
+      }
+
+      #nav-dots {
+        position: fixed;
+        right: 1.4rem;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--border);
+        cursor: pointer;
+        transition: all 0.3s var(--ease);
+      }
+      .dot.active {
+        background: var(--cyan);
+        box-shadow: 0 0 8px var(--cyan);
+        height: 18px;
+        border-radius: 3px;
+      }
+
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--cyan), var(--orange));
+        z-index: 1000;
+        transition: width 0.5s var(--ease);
+        width: 0%;
+      }
+
+      /* ===========================================
+   REVEAL ANIMATIONS
+   =========================================== */
+      .reveal {
+        opacity: 0;
+        transform: translateY(22px);
+        transition:
+          opacity 0.7s var(--ease),
+          transform 0.7s var(--ease);
+      }
+      .slide.visible .reveal {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .reveal:nth-child(1) {
+        transition-delay: 0.05s;
+      }
+      .reveal:nth-child(2) {
+        transition-delay: 0.15s;
+      }
+      .reveal:nth-child(3) {
+        transition-delay: 0.25s;
+      }
+      .reveal:nth-child(4) {
+        transition-delay: 0.35s;
+      }
+      .reveal:nth-child(5) {
+        transition-delay: 0.45s;
+      }
+      .reveal:nth-child(6) {
+        transition-delay: 0.55s;
+      }
+      .reveal:nth-child(7) {
+        transition-delay: 0.65s;
+      }
+
+      /* ===========================================
+   TYPOGRAPHY
+   =========================================== */
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: var(--small-size);
+        color: var(--cyan);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: clamp(0.3rem, 0.8vh, 0.7rem);
+      }
+
+      h1 {
+        font-size: var(--title-size);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        font-size: var(--h2-size);
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+      }
+
+      h3 {
+        font-size: var(--h3-size);
+        font-weight: 600;
+      }
+
+      p {
+        font-size: var(--body-size);
+        line-height: 1.65;
+        color: #999;
+      }
+
+      .cyan {
+        color: var(--cyan);
+      }
+      .orange {
+        color: var(--orange);
+      }
+
+      /* ===========================================
+   UI COMPONENTS
+   =========================================== */
+
+      /* Horizontal rule */
+      .sep {
+        height: 1px;
+        background: var(--border);
+        margin: clamp(0.4rem, 1vh, 1rem) 0;
+      }
+
+      /* Chip / badge */
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(0, 212, 255, 0.08);
+        border: 1px solid rgba(0, 212, 255, 0.25);
+        color: var(--cyan);
+        font-family: var(--mono);
+        font-size: var(--small-size);
+        padding: 4px 11px;
+        border-radius: 20px;
+        white-space: nowrap;
+      }
+      .chip.o {
+        background: rgba(255, 107, 53, 0.08);
+        border-color: rgba(255, 107, 53, 0.25);
+        color: var(--orange);
+      }
+
+      /* Live URL badge */
+      .url-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 7px 14px;
+        font-family: var(--mono);
+        font-size: var(--mono-size);
+        color: #666;
+      }
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 6px #22c55e;
+        animation: blink 2s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.25;
+        }
+      }
+
+      /* Code / formula blocks */
+      .code-block {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--cyan);
+        border-radius: 8px;
+        padding: clamp(0.7rem, 1.8vh, 1.1rem) clamp(0.8rem, 2vw, 1.4rem);
+        font-family: var(--mono);
+        font-size: var(--mono-size);
+        line-height: 1.85;
+        white-space: pre;
+        overflow: hidden;
+      }
+      .formula-block {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--orange);
+        border-radius: 8px;
+        padding: clamp(0.7rem, 1.8vh, 1.1rem) clamp(0.8rem, 2vw, 1.4rem);
+        font-family: var(--mono);
+        font-size: clamp(0.8rem, 1.4vw, 1rem);
+        line-height: 1.9;
+        white-space: pre;
+        overflow: hidden;
+      }
+
+      .cc {
+        color: var(--cyan);
+      }
+      .co {
+        color: var(--orange);
+      }
+      .cd {
+        color: #444;
+      }
+
+      /* Numbered step list */
+      .steps {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.45rem, 1.1vh, 0.9rem);
+      }
+      .steps li {
+        display: flex;
+        align-items: flex-start;
+        gap: clamp(0.6rem, 1.4vw, 1rem);
+        font-size: var(--body-size);
+        color: #ccc;
+        line-height: 1.45;
+      }
+      .sn {
+        font-family: var(--mono);
+        font-size: var(--small-size);
+        color: var(--orange);
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid rgba(255, 107, 53, 0.25);
+        border-radius: 4px;
+        padding: 2px 7px;
+        flex-shrink: 0;
+        margin-top: 0.05em;
+      }
+
+      /* Mode cards grid */
+      .mode-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: clamp(0.4rem, 0.9vw, 0.7rem);
+      }
+      .mode-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: clamp(0.6rem, 1.3vh, 0.9rem) clamp(0.7rem, 1.2vw, 0.9rem);
+        transition: border-color 0.2s;
+      }
+      .mode-card:hover {
+        border-color: rgba(0, 212, 255, 0.35);
+      }
+      .mode-name {
+        font-family: var(--mono);
+        font-size: var(--small-size);
+        color: var(--cyan);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 5px;
+      }
+      .mdot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .mode-card p {
+        font-size: clamp(0.62rem, 0.9vw, 0.77rem);
+        color: #666;
+        line-height: 1.45;
+      }
+
+      /* Two column */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(1rem, 3vw, 2.5rem);
+        align-items: start;
+      }
+
+      /* Option card */
+      .opt-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: clamp(0.9rem, 2vh, 1.4rem) clamp(0.9rem, 2vw, 1.4rem);
+      }
+      .opt-label {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: var(--small-size);
+        padding: 3px 10px;
+        border-radius: 12px;
+        margin-bottom: clamp(0.4rem, 0.8vh, 0.7rem);
+      }
+      .opt-label.a {
+        background: rgba(0, 212, 255, 0.12);
+        color: var(--cyan);
+        border: 1px solid rgba(0, 212, 255, 0.25);
+      }
+      .opt-label.b {
+        background: rgba(255, 107, 53, 0.12);
+        color: var(--orange);
+        border: 1px solid rgba(255, 107, 53, 0.25);
+      }
+      .opt-card h3 {
+        margin-bottom: clamp(0.3rem, 0.6vh, 0.5rem);
+      }
+      .opt-card p {
+        font-size: clamp(0.72rem, 1.1vw, 0.87rem);
+        color: #777;
+        line-height: 1.55;
+      }
+
+      /* Info overlay preview */
+      .overlay-preview {
+        background: rgba(0, 0, 0, 0.75);
+        border-left: 3px solid var(--cyan);
+        border-radius: 6px;
+        padding: clamp(0.6rem, 1.5vh, 0.9rem) clamp(0.8rem, 1.5vw, 1.1rem);
+        font-family: var(--mono);
+        font-size: clamp(0.64rem, 1vw, 0.82rem);
+        display: inline-block;
+      }
+      .ov-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 2px 0;
+      }
+      .ov-key {
+        color: #6699aa;
+      }
+      .ov-val {
+        color: #fff;
+      }
+
+      /* Bullet dot list */
+      .dot-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.3rem, 0.7vh, 0.6rem);
+      }
+      .dot-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: var(--body-size);
+        color: #ccc;
+      }
+      .dl-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      /* Slide number */
+      .snum {
+        position: absolute;
+        bottom: 1.3rem;
+        left: var(--pad);
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        color: #2a2a2a;
+      }
+
+      /* Glow on title */
+      .glow {
+        text-shadow: 0 0 70px rgba(0, 212, 255, 0.28);
+      }
+
+      /* ===========================================
+   RESPONSIVE BREAKPOINTS
+   =========================================== */
+      @media (max-height: 700px) {
+        :root {
+          --pad: clamp(1rem, 3vw, 2.5rem);
+          --gap: clamp(0.35rem, 1vh, 0.7rem);
+        }
+      }
+      @media (max-height: 600px) {
+        :root {
+          --title-size: clamp(1.4rem, 5vw, 3rem);
+          --h2-size: clamp(1.1rem, 3vw, 2rem);
+          --body-size: clamp(0.7rem, 1.1vw, 0.88rem);
+        }
+        .mode-grid {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
+      @media (max-height: 500px) {
+        :root {
+          --pad: clamp(0.5rem, 2vw, 1.2rem);
+        }
+        #nav-dots,
+        .snum {
+          display: none;
+        }
+      }
+      @media (max-width: 768px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+        .mode-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        #nav-dots {
+          display: none;
+        }
+        :root {
+          --title-size: clamp(1.8rem, 8vw, 3.5rem);
+        }
+      }
+      @media (max-width: 480px) {
+        .mode-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .reveal {
+          transition: opacity 0.3s ease;
+          transform: none;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+        .live-dot {
+          animation: none;
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Ambient background canvas (floating LED pixels) -->
+    <canvas
+      id="bg-canvas"
+      style="
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.35;
+      "
+    ></canvas>
+
+    <!-- Progress bar -->
+    <div id="progress"></div>
+
+    <!-- Language toggle -->
+    <div id="lang-toggle">
+      <button class="lang-btn active" data-l="en">EN</button>
+      <button class="lang-btn" data-l="ko">한국어</button>
+      <button class="lang-btn" data-l="ja">日本語</button>
+    </div>
+
+    <!-- Navigation dots -->
+    <nav id="nav-dots"></nav>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 01 — TITLE
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s1">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="LED Screen Tool"
+          data-ko="LED 스크린 도구"
+          data-ja="LEDスクリーンツール"
+        >
+          LED Screen Tool
+        </p>
+        <h1 class="glow reveal">
+          <span
+            class="cyan"
+            data-en="LED Screen"
+            data-ko="LED 스크린"
+            data-ja="LEDスクリーン"
+            >LED Screen</span
+          ><br />
+          <span
+            data-en="Content Creator"
+            data-ko="콘텐츠 크리에이터"
+            data-ja="コンテンツクリエイター"
+            >Content Creator</span
+          >
+        </h1>
+        <p
+          class="reveal"
+          style="max-width: 520px; margin-top: clamp(0.8rem, 2vh, 1.5rem)"
+          data-en="Pixel-perfect content for any LED screen — preview, animate, and export, right in your browser."
+          data-ko="브라우저에서 바로, 픽셀 단위로 정확한 LED 스크린 콘텐츠를 제작·미리보기·내보내기."
+          data-ja="ブラウザ上で、あらゆるLEDスクリーンにピクセル単位で正確なコンテンツを作成・プレビュー・書き出し。"
+        >
+          Pixel-perfect content for any LED screen — preview, animate, and
+          export, right in your browser.
+        </p>
+        <div
+          class="reveal"
+          style="
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: clamp(1rem, 2.5vh, 2rem);
+            align-items: center;
+          "
+        >
+          <span class="url-badge"
+            ><span class="live-dot"></span>led-creator.vercel.app</span
+          >
+          <span
+            class="chip o"
+            data-en="Zero Dependencies"
+            data-ko="제로 디펜던시"
+            data-ja="依存関係ゼロ"
+            >Zero Dependencies</span
+          >
+        </div>
+      </div>
+      <div class="snum">01 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 02 — OVERVIEW
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s2">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="Overview"
+          data-ko="개요"
+          data-ja="概要"
+        >
+          Overview
+        </p>
+        <h2
+          class="reveal"
+          data-en="What is it?"
+          data-ko="어떤 도구인가요?"
+          data-ja="どんなツール？"
+        >
+          What is it?
+        </h2>
+        <div class="sep reveal"></div>
+        <div
+          class="two-col reveal"
+          style="margin-top: clamp(0.4rem, 1vh, 0.9rem)"
+        >
+          <div>
+            <p
+              style="margin-bottom: clamp(0.5rem, 1.2vh, 0.9rem)"
+              data-en="LED screens have a pixel pitch — the spacing between LEDs — that combined with physical size determines the exact screen resolution."
+              data-ko="LED 스크린은 픽셀 피치(LED 간격)와 물리적 크기가 함께 정확한 해상도를 결정합니다."
+              data-ja="LEDスクリーンはピクセルピッチ（LED間の間隔）と物理サイズが組み合わさって正確な解像度を決定します。"
+            >
+              LED screens have a pixel pitch — the spacing between LEDs — that
+              combined with physical size determines the exact screen
+              resolution.
+            </p>
+            <p
+              data-en="This tool calculates that resolution and renders a canvas at exact pixel dimensions — so what you design is what the screen shows."
+              data-ko="이 도구는 해상도를 계산하고 정확한 픽셀 크기의 캔버스를 렌더링합니다. 제작한 그대로 스크린에 표시됩니다."
+              data-ja="このツールはその解像度を計算し、正確なピクセルサイズのキャンバスをレンダリングします。デザインしたままスクリーンに表示されます。"
+            >
+              This tool calculates that resolution and renders a canvas at exact
+              pixel dimensions — so what you design is what the screen shows.
+            </p>
+            <div
+              style="
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                margin-top: clamp(0.6rem, 1.5vh, 1.1rem);
+              "
+            >
+              <span
+                class="chip"
+                data-en="Browser-based"
+                data-ko="브라우저 기반"
+                data-ja="ブラウザベース"
+                >Browser-based</span
+              >
+              <span
+                class="chip"
+                data-en="No install"
+                data-ko="설치 불필요"
+                data-ja="インストール不要"
+                >No install</span
+              >
+              <span
+                class="chip o"
+                data-en="Single HTML file"
+                data-ko="단일 HTML 파일"
+                data-ja="HTMLファイル一つ"
+                >Single HTML file</span
+              >
+            </div>
+          </div>
+          <div
+            style="display: flex; align-items: center; justify-content: center"
+          >
+            <div id="led-demo"></div>
+          </div>
+        </div>
+      </div>
+      <div class="snum">02 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 03 — RESOLUTION FORMULA
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s3">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="The Math"
+          data-ko="해상도 공식"
+          data-ja="解像度の計算"
+        >
+          The Math
+        </p>
+        <h2
+          class="reveal"
+          data-en="Pixel Resolution Formula"
+          data-ko="픽셀 해상도 계산 공식"
+          data-ja="ピクセル解像度の計算式"
+        >
+          Pixel Resolution Formula
+        </h2>
+        <div class="sep reveal"></div>
+        <div
+          class="formula-block reveal"
+          style="margin-top: clamp(0.4rem, 1vh, 0.8rem)"
+        >
+          <span class="cc">pixelsWide</span> = round( widthMeters × 1000 /
+          <span class="co">pitchMm</span> )
+          <span class="cc">pixelsTall </span> = round( heightMeters × 1000 /
+          <span class="co">pitchMm</span> )
+        </div>
+        <div
+          class="code-block reveal"
+          style="margin-top: clamp(0.4rem, 1vh, 0.8rem)"
+        >
+          <span
+            class="cd"
+            data-en="// Example: 4m × 2m screen at P4"
+            data-ko="// 예시: P4, 4m × 2m 스크린"
+            data-ja="// 例：4m × 2m スクリーン、P4ピッチ"
+            >// Example: 4m × 2m screen at P4</span
+          >
+          <span class="cc">pixelsWide</span> = round( 4000 /
+          <span class="co">4</span> ) = <span class="cc">1000</span>
+          <span class="cc">pixelsTall </span> = round( 2000 /
+          <span class="co">4</span> ) = <span class="cc">500</span>
+          <span
+            class="cd"
+            data-en="// Result: 1000 × 500 px canvas"
+            data-ko="// 결과: 1000 × 500 픽셀 캔버스"
+            data-ja="// 結果：1000 × 500 px キャンバス"
+            >// Result: 1000 × 500 px canvas</span
+          >
+        </div>
+      </div>
+      <div class="snum">03 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 04 — SETUP
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s4">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="Quick Start"
+          data-ko="빠른 시작"
+          data-ja="クイックスタート"
+        >
+          Quick Start
+        </p>
+        <h2
+          class="reveal"
+          data-en="Getting Started"
+          data-ko="시작하기"
+          data-ja="使い始め方"
+        >
+          Getting Started
+        </h2>
+        <div class="sep reveal"></div>
+        <ul
+          class="steps reveal"
+          style="margin-top: clamp(0.3rem, 0.8vh, 0.7rem)"
+        >
+          <li>
+            <span class="sn">01</span>
+            <span
+              data-en="Open the app — a setup modal appears automatically"
+              data-ko="앱을 열면 설정 모달이 자동으로 나타납니다"
+              data-ja="アプリを開くとセットアップ画面が自動表示"
+              >Open the app — a setup modal appears automatically</span
+            >
+          </li>
+          <li>
+            <span class="sn">02</span>
+            <span
+              data-en="Enter screen width &amp; height in meters"
+              data-ko="스크린 너비와 높이를 미터 단위로 입력"
+              data-ja="スクリーンの幅と高さをメートルで入力"
+              >Enter screen width &amp; height in meters</span
+            >
+          </li>
+          <li>
+            <span class="sn">03</span>
+            <span
+              data-en="Select LED pitch (P1.5 → P20), or type a custom mm value"
+              data-ko="LED 피치 선택 (P1.5 → P20) 또는 직접 mm 값 입력"
+              data-ja="LEDピッチを選択 (P1.5 → P20)、またはカスタム値を入力"
+              >Select LED pitch (P1.5 → P20), or type a custom mm value</span
+            >
+          </li>
+          <li>
+            <span class="sn">04</span>
+            <span
+              data-en="Live preview shows exact resolution and total pixel count"
+              data-ko="실시간으로 정확한 해상도와 총 픽셀 수 미리보기"
+              data-ja="正確な解像度と総ピクセル数をリアルタイムプレビュー"
+              >Live preview shows exact resolution and total pixel count</span
+            >
+          </li>
+          <li>
+            <span class="sn">05</span>
+            <span
+              ><span
+                class="orange"
+                data-en='Click "Create Content →" to open the editor'
+                data-ko='"콘텐츠 만들기 →" 클릭하여 에디터 열기'
+                data-ja='"コンテンツを作成 →" をクリックしてエディターを開く'
+                >Click "Create Content →" to open the editor</span
+              ></span
+            >
+          </li>
+        </ul>
+        <p
+          class="reveal"
+          style="
+            margin-top: clamp(0.5rem, 1.2vh, 1rem);
+            font-size: var(--small-size);
+            color: var(--dim);
+          "
+          data-en="Tip: the ✎ Edit button in the top bar reopens the modal at any time."
+          data-ko="팁: 상단 바의 ✎ 편집 버튼으로 언제든지 설정을 다시 열 수 있습니다."
+          data-ja="ヒント：上部バーの ✎ 編集ボタンでいつでも設定を再表示できます。"
+        >
+          Tip: the ✎ Edit button in the top bar reopens the modal at any time.
+        </p>
+      </div>
+      <div class="snum">04 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 05 — ANIMATION MODES
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s5">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="Content"
+          data-ko="콘텐츠"
+          data-ja="コンテンツ"
+        >
+          Content
+        </p>
+        <h2
+          class="reveal"
+          data-en="5 Animation Modes"
+          data-ko="5가지 애니메이션 모드"
+          data-ja="5つのアニメーションモード"
+        >
+          5 Animation Modes
+        </h2>
+        <div class="sep reveal"></div>
+        <div
+          class="mode-grid reveal"
+          style="margin-top: clamp(0.35rem, 0.9vh, 0.7rem)"
+        >
+          <div class="mode-card">
+            <div class="mode-name">
+              <span class="mdot" style="background: #fff"></span>Color Test
+            </div>
+            <p
+              data-en="Broadcast test pattern — color bars, grayscale ramp, crosshair, corner markers. Breathing &amp; cycle."
+              data-ko="방송 테스트 패턴 — 컬러 바, 그레이스케일 램프, 크로스헤어, 코너 마커. 호흡 효과 및 컬러 사이클."
+              data-ja="放送テストパターン — カラーバー、グレースケールランプ、クロスヘア、コーナーマーカー。ブリージング＆サイクル。"
+            >
+              Broadcast test pattern — color bars, grayscale ramp, crosshair,
+              corner markers. Breathing &amp; cycle.
+            </p>
+          </div>
+          <div class="mode-card">
+            <div class="mode-name">
+              <span class="mdot" style="background: var(--cyan)"></span>Scroll
+              Text
+            </div>
+            <p
+              data-en="Text scrolls horizontally. Customise text content, color, background, and font size."
+              data-ko="텍스트 가로 스크롤. 내용, 색상, 배경, 폰트 크기 설정 가능."
+              data-ja="テキストが横スクロール。テキスト内容・色・背景・フォントサイズをカスタマイズ。"
+            >
+              Text scrolls horizontally. Customise text content, color,
+              background, and font size.
+            </p>
+          </div>
+          <div class="mode-card">
+            <div class="mode-name">
+              <span class="mdot" style="background: var(--orange)"></span>Color
+              Seq
+            </div>
+            <p
+              data-en="Define a list of colors with per-step durations and optional fade transitions."
+              data-ko="지속 시간과 페이드 전환이 있는 색상 시퀀스 정의."
+              data-ja="持続時間とフェードトランジション付きのカラーシーケンスを定義。"
+            >
+              Define a list of colors with per-step durations and optional fade
+              transitions.
+            </p>
+          </div>
+          <div class="mode-card">
+            <div class="mode-name">
+              <span class="mdot" style="background: #a78bfa"></span>Patterns
+            </div>
+            <p
+              data-en="Pulse · Wave · Sweep · Checker · Sparkle. Two-color configurable animated geometrics."
+              data-ko="펄스·웨이브·스윕·체커·스파클. 두 가지 색상의 기하학적 애니메이션."
+              data-ja="パルス・ウェーブ・スウィープ・チェッカー・スパークル。2色設定可能なアニメパターン。"
+            >
+              Pulse · Wave · Sweep · Checker · Sparkle. Two-color configurable
+              animated geometrics.
+            </p>
+          </div>
+          <div class="mode-card">
+            <div class="mode-name">
+              <span class="mdot" style="background: #34d399"></span>Images
+            </div>
+            <p
+              data-en="Upload one or more images, set display duration per frame. Loops automatically."
+              data-ko="이미지 업로드 후 프레임별 지속 시간 설정. 자동 반복 재생."
+              data-ja="画像をアップロードし、フレームごとの表示時間を設定。自動ループ。"
+            >
+              Upload one or more images, set display duration per frame. Loops
+              automatically.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="snum">05 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 06 — EXPORT VIDEO
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s6">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="Export"
+          data-ko="내보내기"
+          data-ja="エクスポート"
+        >
+          Export
+        </p>
+        <h2
+          class="reveal"
+          data-en="Export to Video"
+          data-ko="비디오로 내보내기"
+          data-ja="動画へのエクスポート"
+        >
+          Export to Video
+        </h2>
+        <div class="sep reveal"></div>
+        <ul
+          class="steps reveal"
+          style="margin-top: clamp(0.3rem, 0.8vh, 0.7rem)"
+        >
+          <li>
+            <span class="sn">01</span>
+            <span
+              data-en="Click ⬇ Export in the toolbar"
+              data-ko="툴바에서 ⬇ 내보내기 클릭"
+              data-ja="ツールバーの ⬇ エクスポートをクリック"
+              >Click ⬇ Export in the toolbar</span
+            >
+          </li>
+          <li>
+            <span class="sn">02</span>
+            <span
+              data-en="Set loop duration — 2s / 5s / 10s / 20s"
+              data-ko="루프 길이 설정 — 2s / 5s / 10s / 20s"
+              data-ja="ループ時間を設定 — 2s / 5s / 10s / 20s"
+              >Set loop duration — 2s / 5s / 10s / 20s</span
+            >
+          </li>
+          <li>
+            <span class="sn">03</span>
+            <span
+              data-en="Drag the in / out handles on the timeline to select your range"
+              data-ko="타임라인의 인/아웃 핸들을 드래그해 범위 선택"
+              data-ja="タイムラインのイン/アウトハンドルをドラッグして範囲を選択"
+              >Drag the in / out handles on the timeline to select your
+              range</span
+            >
+          </li>
+          <li>
+            <span class="sn">04</span>
+            <span
+              data-en="Click ⏺ Record — animation auto-seeks to in-point and records at 30fps"
+              data-ko="⏺ 녹화 클릭 — 애니메이션이 인포인트로 자동 이동 후 30fps 녹화"
+              data-ja="⏺ 録画をクリック — アニメーションがインポイントへ自動シークし、30fpsで録画"
+              >Click ⏺ Record — animation auto-seeks to in-point and records at
+              30fps</span
+            >
+          </li>
+          <li>
+            <span class="sn">05</span>
+            <span
+              data-en="File downloads automatically (MP4 where supported, WebM otherwise)"
+              data-ko="파일 자동 다운로드 (지원 시 MP4, 아니면 WebM)"
+              data-ja="ファイルが自動ダウンロード（対応ブラウザでMP4、それ以外はWebM）"
+              >File downloads automatically (MP4 where supported, WebM
+              otherwise)</span
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="snum">06 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 07 — INFO OVERLAY
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s7">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="Metadata"
+          data-ko="메타데이터"
+          data-ja="メタデータ"
+        >
+          Metadata
+        </p>
+        <h2
+          class="reveal"
+          data-en="Burned-in Info Overlay"
+          data-ko="영상에 포함된 정보 오버레이"
+          data-ja="焼き込み情報オーバーレイ"
+        >
+          Burned-in Info Overlay
+        </h2>
+        <div class="sep reveal"></div>
+        <div
+          class="two-col reveal"
+          style="
+            margin-top: clamp(0.4rem, 1vh, 0.8rem);
+            gap: clamp(1rem, 4vw, 3rem);
+          "
+        >
+          <div>
+            <p
+              style="margin-bottom: clamp(0.5rem, 1.2vh, 0.9rem)"
+              data-en="Every exported video has a bottom-right info panel burned in. You always know exactly what spec you're looking at."
+              data-ko="내보낸 모든 영상의 우측 하단에 정보 패널이 포함됩니다. 항상 정확한 스펙을 확인할 수 있습니다."
+              data-ja="エクスポートされたすべての動画の右下に情報パネルが焼き込まれます。常に正確なスペックを確認できます。"
+            >
+              Every exported video has a bottom-right info panel burned in. You
+              always know exactly what spec you're looking at.
+            </p>
+            <ul class="dot-list">
+              <li>
+                <span class="dl-dot" style="background: var(--cyan)"></span>
+                <span data-en="LED Pitch" data-ko="LED 피치" data-ja="LEDピッチ"
+                  >LED Pitch</span
+                >
+              </li>
+              <li>
+                <span class="dl-dot" style="background: var(--cyan)"></span>
+                <span
+                  data-en="Screen Size"
+                  data-ko="스크린 크기"
+                  data-ja="スクリーンサイズ"
+                  >Screen Size</span
+                >
+              </li>
+              <li>
+                <span class="dl-dot" style="background: var(--cyan)"></span>
+                <span data-en="Resolution" data-ko="해상도" data-ja="解像度"
+                  >Resolution</span
+                >
+              </li>
+              <li>
+                <span class="dl-dot" style="background: var(--orange)"></span>
+                <span
+                  data-en="FPS (actual measured)"
+                  data-ko="FPS (실측값)"
+                  data-ja="FPS（実測値）"
+                  >FPS (actual measured)</span
+                >
+              </li>
+              <li>
+                <span class="dl-dot" style="background: var(--orange)"></span>
+                <span
+                  data-en="Bitrate"
+                  data-ko="비트레이트"
+                  data-ja="ビットレート"
+                  >Bitrate</span
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <div class="overlay-preview">
+              <div class="ov-row">
+                <span
+                  class="ov-key"
+                  data-en="Pitch"
+                  data-ko="피치"
+                  data-ja="ピッチ"
+                  >Pitch</span
+                ><span class="ov-val">P4</span>
+              </div>
+              <div class="ov-row">
+                <span
+                  class="ov-key"
+                  data-en="Screen"
+                  data-ko="스크린"
+                  data-ja="スクリーン"
+                  >Screen</span
+                ><span class="ov-val">4m × 2m</span>
+              </div>
+              <div class="ov-row">
+                <span
+                  class="ov-key"
+                  data-en="Resolution"
+                  data-ko="해상도"
+                  data-ja="解像度"
+                  >Resolution</span
+                ><span class="ov-val">1000 × 500 px</span>
+              </div>
+              <div class="ov-row">
+                <span class="ov-key">FPS</span><span class="ov-val">30</span>
+              </div>
+              <div class="ov-row">
+                <span
+                  class="ov-key"
+                  data-en="Bitrate"
+                  data-ko="비트레이트"
+                  data-ja="ビットレート"
+                  >Bitrate</span
+                ><span class="ov-val">10 Mbps</span>
+              </div>
+            </div>
+            <p
+              style="
+                margin-top: 0.6rem;
+                font-size: var(--small-size);
+                color: #333;
+              "
+              data-en="↑ preview of the burned-in overlay"
+              data-ko="↑ 영상에 포함되는 오버레이 미리보기"
+              data-ja="↑ 焼き込まれるオーバーレイのプレビュー"
+            >
+              ↑ preview of the burned-in overlay
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="snum">07 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 08 — USING ON A REAL SCREEN
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s8">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="Deployment"
+          data-ko="실제 사용"
+          data-ja="実際の使い方"
+        >
+          Deployment
+        </p>
+        <h2
+          class="reveal"
+          data-en="On a Real LED Screen"
+          data-ko="실제 LED 스크린에서"
+          data-ja="実際のLEDスクリーンで"
+        >
+          On a Real LED Screen
+        </h2>
+        <div class="sep reveal"></div>
+        <div
+          class="two-col reveal"
+          style="margin-top: clamp(0.4rem, 1vh, 0.8rem)"
+        >
+          <div class="opt-card">
+            <span
+              class="opt-label a"
+              data-en="Option A"
+              data-ko="방법 A"
+              data-ja="方法 A"
+              >Option A</span
+            >
+            <h3
+              data-en="Direct Connection"
+              data-ko="직접 연결"
+              data-ja="直接接続"
+            >
+              Direct Connection
+            </h3>
+            <p
+              data-en="Connect the LED screen as a second monitor → open the app in browser → click ⛶ Full → drag the window to the LED display. No export needed."
+              data-ko="LED 스크린을 두 번째 모니터로 연결 → 브라우저에서 앱 열기 → ⛶ 전체화면 → LED 디스플레이로 창 이동. 내보내기 불필요."
+              data-ja="LEDスクリーンをセカンドモニターとして接続 → ブラウザでアプリを開く → ⛶ 全画面 → ウィンドウをLEDディスプレイへ移動。書き出し不要。"
+            >
+              Connect the LED screen as a second monitor → open the app in
+              browser → click ⛶ Full → drag the window to the LED display. No
+              export needed.
+            </p>
+          </div>
+          <div class="opt-card">
+            <span
+              class="opt-label b"
+              data-en="Option B"
+              data-ko="방법 B"
+              data-ja="方法 B"
+              >Option B</span
+            >
+            <h3
+              data-en="Video File"
+              data-ko="비디오 파일"
+              data-ja="動画ファイル"
+            >
+              Video File
+            </h3>
+            <p
+              data-en="Export a video and load it into the screen's media player — NovaStudio, Verypixel, etc. WebM → MP4 via HandBrake if needed."
+              data-ko="영상을 내보낸 후 NovaStudio, Verypixel 등 미디어 플레이어에 로드. 필요 시 HandBrake로 WebM → MP4 변환."
+              data-ja="動画を書き出してNovaStudio・Verypixelなどのメディアプレイヤーに読み込む。必要ならHandBrakeでWebM → MP4変換。"
+            >
+              Export a video and load it into the screen's media player —
+              NovaStudio, Verypixel, etc. WebM → MP4 via HandBrake if needed.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="snum">08 / 09</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     SLIDE 09 — TECH / CTA
+     ═══════════════════════════════════════ -->
+    <section class="slide" id="s9">
+      <div class="slide-inner">
+        <p
+          class="eyebrow reveal"
+          data-en="Tech"
+          data-ko="기술 사양"
+          data-ja="技術仕様"
+        >
+          Tech
+        </p>
+        <h2
+          class="reveal"
+          data-en="Zero Dependencies"
+          data-ko="제로 디펜던시"
+          data-ja="依存関係ゼロ"
+        >
+          Zero Dependencies
+        </h2>
+        <div class="sep reveal"></div>
+        <p
+          class="reveal"
+          style="max-width: 480px; margin-top: clamp(0.3rem, 0.7vh, 0.6rem)"
+          data-en="A single HTML file. No npm, no build step, no framework. Open in any browser and it works."
+          data-ko="단일 HTML 파일. npm, 빌드 과정, 프레임워크 없음. 어떤 브라우저에서도 바로 실행."
+          data-ja="HTMLファイル一つ。npmなし、ビルド不要、フレームワークなし。どのブラウザでも即動作。"
+        >
+          A single HTML file. No npm, no build step, no framework. Open in any
+          browser and it works.
+        </p>
+        <div
+          class="code-block reveal"
+          style="margin-top: clamp(0.5rem, 1.3vh, 1rem)"
+        >
+          led-creator/ └── index.html
+          <span
+            class="cd"
+            data-en="# the entire app"
+            data-ko="# 전체 앱"
+            data-ja="# アプリ全体"
+            ># the entire app</span
+          >
+
+          <span
+            class="cd"
+            data-en="# deploy to Vercel"
+            data-ko="# Vercel에 배포"
+            data-ja="# Vercelにデプロイ"
+            ># deploy</span
+          >
+          vercel --prod
+        </div>
+        <div
+          class="reveal"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: clamp(0.7rem, 1.8vh, 1.4rem);
+          "
+        >
+          <span class="url-badge"
+            ><span class="live-dot"></span>led-creator.vercel.app</span
+          >
+          <span
+            class="chip o"
+            data-en="Open in browser →"
+            data-ko="브라우저에서 열기 →"
+            data-ja="ブラウザで開く →"
+            >Open in browser →</span
+          >
+        </div>
+      </div>
+      <div class="snum">09 / 09</div>
+    </section>
+
+    <script>
+      /* ===========================================
+   FLOATING LED PIXEL BACKGROUND
+   Canvas animation — ambient glowing pixels
+   =========================================== */
+      (function () {
+        const canvas = document.getElementById("bg-canvas");
+        const ctx = canvas.getContext("2d");
+        let pixels = [];
+
+        function resize() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+
+        function init() {
+          pixels = [];
+          const n = Math.floor((canvas.width * canvas.height) / 16000);
+          for (let i = 0; i < n; i++) {
+            pixels.push({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              sz: Math.random() * 3 + 1.5,
+              cyan: Math.random() > 0.7,
+              alpha: Math.random() * 0.55 + 0.05,
+              phase: Math.random() * Math.PI * 2,
+              spd: Math.random() * 0.007 + 0.003,
+            });
+          }
+        }
+
+        let frame = 0;
+        function draw() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          frame++;
+          pixels.forEach((p) => {
+            const a =
+              p.alpha * (0.45 + 0.55 * Math.sin(frame * p.spd + p.phase));
+            ctx.fillStyle = p.cyan
+              ? `rgba(0,212,255,${a.toFixed(3)})`
+              : `rgba(255,107,53,${a.toFixed(3)})`;
+            ctx.fillRect(p.x, p.y, p.sz, p.sz);
+          });
+          requestAnimationFrame(draw);
+        }
+
+        window.addEventListener("resize", () => {
+          resize();
+          init();
+        });
+        resize();
+        init();
+        draw();
+      })();
+
+      /* ===========================================
+   LED DEMO GRID (Slide 2)
+   Animated mini LED pixel grid
+   =========================================== */
+      (function () {
+        const grid = document.getElementById("led-demo");
+        if (!grid) return;
+
+        const COLS = 14,
+          ROWS = 8;
+        const cells = [];
+
+        grid.style.display = "grid";
+        grid.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+        grid.style.gap = "4px";
+
+        const CYAN = "#00d4ff",
+          ORANGE = "#ff6b35",
+          OFF = "#1c1c1c";
+
+        // Initial pattern — LED logo-ish
+        const pattern = [
+          1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1,
+          0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+          1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+          0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0,
+          1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0,
+        ];
+
+        for (let i = 0; i < COLS * ROWS; i++) {
+          const d = document.createElement("div");
+          const lit = pattern[i];
+          d.style.width = "11px";
+          d.style.height = "11px";
+          d.style.borderRadius = "2px";
+          d.style.transition = "background 0.3s, box-shadow 0.3s";
+          const color = lit ? (i % 3 === 0 ? ORANGE : CYAN) : OFF;
+          d.style.background = color;
+          if (lit) d.style.boxShadow = `0 0 5px ${color}`;
+          grid.appendChild(d);
+          cells.push(d);
+        }
+
+        // Random twinkle
+        setInterval(() => {
+          const i = Math.floor(Math.random() * cells.length);
+          if (pattern[i]) return; // don't override pattern pixels
+          const c = cells[i];
+          const isC = Math.random() > 0.4;
+          c.style.background = isC ? CYAN : ORANGE;
+          c.style.boxShadow = `0 0 5px ${isC ? CYAN : ORANGE}`;
+          setTimeout(() => {
+            c.style.background = OFF;
+            c.style.boxShadow = "none";
+          }, 600);
+        }, 120);
+      })();
+
+      /* ===========================================
+   PRESENTATION CONTROLLER
+   Navigation, scroll-snap, dots, progress,
+   keyboard + touch controls
+   =========================================== */
+      class Slides {
+        constructor() {
+          this.slides = Array.from(document.querySelectorAll(".slide"));
+          this.current = 0;
+          this.dotsEl = document.getElementById("nav-dots");
+          this.bar = document.getElementById("progress");
+
+          this._buildDots();
+          this._observe();
+          this._bindKeys();
+          this._bindTouch();
+          this._setActive(0);
+        }
+
+        _buildDots() {
+          this.slides.forEach((_, i) => {
+            const d = document.createElement("div");
+            d.className = "dot";
+            d.addEventListener("click", () => this._go(i));
+            this.dotsEl.appendChild(d);
+          });
+        }
+
+        _observe() {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) {
+                  e.target.classList.add("visible");
+                  this._setActive(this.slides.indexOf(e.target));
+                }
+              });
+            },
+            { threshold: 0.55 },
+          );
+          this.slides.forEach((s) => io.observe(s));
+        }
+
+        _bindKeys() {
+          window.addEventListener("keydown", (e) => {
+            const tgt = e.target.tagName;
+            if (tgt === "INPUT" || tgt === "TEXTAREA") return;
+            if (["ArrowDown", "ArrowRight", "PageDown"].includes(e.key)) {
+              e.preventDefault();
+              this._go(this.current + 1);
+            }
+            if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) {
+              e.preventDefault();
+              this._go(this.current - 1);
+            }
+          });
+        }
+
+        _bindTouch() {
+          let y0 = 0;
+          window.addEventListener(
+            "touchstart",
+            (e) => {
+              y0 = e.touches[0].clientY;
+            },
+            { passive: true },
+          );
+          window.addEventListener(
+            "touchend",
+            (e) => {
+              const dy = y0 - e.changedTouches[0].clientY;
+              if (Math.abs(dy) > 45) this._go(this.current + (dy > 0 ? 1 : -1));
+            },
+            { passive: true },
+          );
+        }
+
+        _go(i) {
+          const idx = Math.max(0, Math.min(this.slides.length - 1, i));
+          this.slides[idx].scrollIntoView({ behavior: "smooth" });
+        }
+
+        _setActive(i) {
+          if (i < 0 || i >= this.slides.length) return;
+          this.current = i;
+          const dots = this.dotsEl.querySelectorAll(".dot");
+          dots.forEach((d, j) => d.classList.toggle("active", j === i));
+          this.bar.style.width = ((i + 1) / this.slides.length) * 100 + "%";
+        }
+      }
+
+      /* ===========================================
+   LANGUAGE SWITCHER
+   Updates all [data-en], [data-ko], [data-ja]
+   text nodes. Saves preference to localStorage.
+   =========================================== */
+      function initLang() {
+        const btns = document.querySelectorAll(".lang-btn");
+
+        function apply(lang) {
+          // Update all translatable text
+          document.querySelectorAll("[data-en]").forEach((el) => {
+            const txt = el.dataset[lang] || el.dataset.en;
+            if (txt !== undefined) el.textContent = txt;
+          });
+          // Highlight active button
+          btns.forEach((b) =>
+            b.classList.toggle("active", b.dataset.l === lang),
+          );
+          // Persist
+          try {
+            localStorage.setItem("led-pres-lang", lang);
+          } catch (_) {}
+        }
+
+        btns.forEach((b) =>
+          b.addEventListener("click", () => apply(b.dataset.l)),
+        );
+
+        // Restore saved language
+        try {
+          const saved = localStorage.getItem("led-pres-lang");
+          if (saved && ["en", "ko", "ja"].includes(saved)) apply(saved);
+        } catch (_) {}
+      }
+
+      /* ===========================================
+   INIT
+   =========================================== */
+      document.addEventListener("DOMContentLoaded", () => {
+        new Slides();
+        initLang();
+      });
+    </script>
+  </body>
+</html>
